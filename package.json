@@ -1,0 +1,23 @@
+{
+  "name": "edusync",
+  "version": "1.0.0",
+  "description": "The College Management Portal is a modern web-based system designed to digitalize and simplify the daily administrative and academic operations of a college",
+  "homepage": "https://github.com/RixPrajapati/EduSync#readme",
+  "bugs": {
+    "url": "https://github.com/RixPrajapati/EduSync/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/RixPrajapati/EduSync.git"
+  },
+  "license": "ISC",
+  "author": "Rix",
+  "type": "module",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "express": "^5.2.1"
+  }
+}
