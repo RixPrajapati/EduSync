@@ -19,34 +19,10 @@ const login = async (data) => {
    const token= jwt.generateJwt(newUser)
   
  return token;
-// {
-//     _id: newUser._id,
-//     userName: newUser.userName,
-//     email: newUser.email,
 
-//     phone: newUser.phone,
-//     address: newUser.address,
-//     gender: newUser.gender,
-//     dob: newUser.dob,
-//     profile: newUser.profile,
-
-//     createdAt: newUser.createdAt,
-//     isActive: newUser.isActive,
-//     updatedAt: newUser.updatedAt,
-//     role: newUser.role,
-//     //   extra for students
-//     rollNo: newUser.rollNo,
-//     semester: newUser.semester,
-//     faculty: newUser.faculty,
-
-//     //   extra for teacher
-
-//     department: newUser.department,
-//     designation: newUser.designation,
-//   };
 };
- const register=async(data)=>{
+ const register=async(data,files)=>{
     
-    return userService.createUser(data);
+    return userService.createUser(data,files);
  }
 export default {login,register}

@@ -17,7 +17,7 @@ const login=async(req,res)=>{
  const register = async(req,res)=>{
 
     try{
-const user=await authService.register(req.body);
+const user=await authService.register(req.body,req.files);
     res.status(200).json({user})
     }catch(err){
         res.status(400).send(err.message)

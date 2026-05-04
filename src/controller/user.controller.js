@@ -14,9 +14,9 @@ const getUsers=async(req,res)=>{
 }
 
 const createUser=async(req,res)=>{
-    console.log(req.body)
+    // console.log(req.body)
     try{
-        const newUser= await userService.createUser(req.body)
+        const newUser= await userService.createUser(req.body,req.files)
   res.json(newUser);
     }catch(err){
         res.status(400).send(err.message)

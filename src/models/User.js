@@ -45,7 +45,7 @@ const userSchema = mongoose.Schema({
     required: [true, "Gender required"],
   },
   dob: { type: Date },
-  profile: { type: String },
+  profile: { type: [String] },
 
   createdAt: { type: Date, default: Date.now() },
   isActive: { type: Boolean, default: true },

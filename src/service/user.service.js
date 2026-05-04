@@ -1,10 +1,13 @@
 import User from "../models/User.js"
 import bcrypt from "bcrypt"
+import uploadFile from "../utils/fileUploder.js";
+import { file } from "zod";
 
 const getUsers = () => {
     return User.find();
 }
-const createUser = async (user) => {
+const createUser = async (user,files) => {
+    const uploadedFiles= await uploadFile(files)
     if (!user.password) {
             throw {
                 status: 400,
@@ -24,7 +27,7 @@ if(check){
     const salt = bcrypt.genSaltSync(10);
     const hashPassword = bcrypt.hashSync(user.password, salt)
 
-    const newUser = await User.create({ ...user, password: hashPassword })
+    const newUser = await User.create({ ...user, password: hashPassword,profile:uploadedFiles.map((file)=>file.url)})
     return {
         _id: newUser._id,
         userName: newUser.userName,
