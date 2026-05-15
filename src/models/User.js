@@ -1,4 +1,6 @@
 import mongoose from "mongoose";
+import { ADMIN, STUDENT, TEACHER } from "../constants/role.js";
+import { FEMALE, MALE, OTHER } from "../constants/gender.js";
 
 const userSchema = mongoose.Schema({
   userName: {
@@ -41,7 +43,7 @@ const userSchema = mongoose.Schema({
   },
   gender: {
     type: String,
-    enum: ["MALE", "FEMALE", "OTHER"],
+    enum: [MALE, FEMALE, OTHER],
     required: [true, "Gender required"],
   },
   dob: { type: Date },
@@ -52,8 +54,8 @@ const userSchema = mongoose.Schema({
   updatedAt: { type: Date, default: Date.now() },
   role: {
     type: [String],
-    enum: ["STUDENT", "TEACHER", "ADMIN"],
-    default: ["STUDENT"],
+    enum: [STUDENT, TEACHER, ADMIN],
+    default: [STUDENT],
   },
   //   extra for students
   rollNo: { type: String },
