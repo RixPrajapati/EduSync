@@ -1,4 +1,4 @@
-import z from 'zod'
+import z, { ZodError } from 'zod'
 
 
 const validation=(schema)=>(req,res,next)=>{
@@ -13,7 +13,7 @@ next();
       return res.status(400).send(err.flatten());
     }
 
-    res.status(400).send(err);
+    res.status(400).send(err.message);
 }
 }
 export default validation;
