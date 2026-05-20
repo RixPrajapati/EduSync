@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 import config from "./config.js";
 
 function dataBaseConnection() {
-  mongoose
+  return mongoose
     .connect(config.dburl)
     .then(() => {
       console.log("DataBase Connected successfully");
