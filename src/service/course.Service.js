@@ -21,7 +21,9 @@ const createCourse = async (data) => {
 };
 
 const updateCourse = async (courseId, data) => {
-  const course = await Course.findByIdAndUpdate(courseId, data, { new: true });
+  const course = await Course.findByIdAndUpdate(courseId, data, {
+    returnDocument: "after",
+  });
   return course;
 };
 
@@ -34,9 +36,9 @@ const getCourseBySem = async (semester) => {
   return await Course.find({ semester: semester });
 };
 
-const getCourseByTeacher = async(teacherId) => {
-  return await Course.find({teacherId}).sort({semester:1});
-}
+const getCourseByTeacher = async (teacherId) => {
+  return await Course.find({ teacherId }).sort({ semester: 1 });
+};
 
 export default {
   getAllCourses,

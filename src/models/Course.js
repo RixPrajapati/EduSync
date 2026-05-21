@@ -26,12 +26,12 @@ const courseSchema = new mongoose.Schema({
     max: 8,
   },
 
-  // teacherId: {
-  //   type: mongoose.Schema.Types.ObjectId,
-  //   ref: "User",
-  //   // required: [true, "Teacher Id is required"],
-  // },
-  discription: {
+  teacherId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+    required: [true, "Teacher Id is required"],
+  },
+  description: {
     type: String,
     default: "",
   },

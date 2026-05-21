@@ -14,19 +14,19 @@ const getCourseById = async (req, res) => {
     const course = await courseService.getCourseById(req.params.id);
     res.status(200).json(course);
   } catch (error) {
-    res.status(400).send("invalid course id");
+    res.status(400).json({ message: "error.message" });
   }
 };
 
 const createCourse = async (req, res) => {
   try {
-    // if (req.user.role === "TEACHER") {
-    //   req.body.teacherId = req.user._id;
-    //
+    {
+      req.body.teacherId = req.token.id;
+    }
     const course = await courseService.createCourse(req.body);
     res.status(201).json(course);
   } catch (error) {
-    res.status(400).json({error: "course already existed"});
+    res.status(400).json({ error: "course already existed" });
   }
 };
 
@@ -47,7 +47,7 @@ const deleteCourse = async (req, res) => {
     await courseService.deleteCourse(req.params.id);
     res.status(200).json({ message: "Course deleted Sucessfully" });
   } catch (error) {
-    res.status(404).json({ message: "Course not found" });
+    res.status(404).json({ message: error.message });
   }
 };
 

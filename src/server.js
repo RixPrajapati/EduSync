@@ -23,6 +23,6 @@ app.use("/api/courses", courseRoute);
 app.use("/api/user", upload.array("profile", 12), userRouter);
 app.use("/api/auth", upload.array("profile", 12), authRouter);
 
-app.listen(config.port, () => {
-  console.log("Server started at 9090");
-});
+app.listen(config.port,()=>{
+    console.log(`Server started at ${config.port} `);
+})
