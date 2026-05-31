@@ -1,6 +1,5 @@
 import { v2 as cloudinary } from "cloudinary";
 
-
 async function uploadFile(files) {
   if (!files) return [];
 
@@ -16,12 +15,12 @@ async function uploadFile(files) {
         .upload_stream(
           {
             folder: "mern-20260320",
-            allowed_formats: ["jpg", "png", "webp", "jpeg"]
+            allowed_formats: ["jpg", "png", "webp", "jpeg"],
           },
           (err, data) => {
             if (err) return reject(err);
             resolve(data);
-          }
+          },
         )
         .end(file.buffer);
     });
