@@ -10,6 +10,11 @@
     "preview": "vite preview"
   },
   "dependencies": {
+<<<<<<<< HEAD:frontend/sanchita-admin-frontend/package.json
+========
+    "@tailwindcss/vite": "^4.3.0",
+    "lucide-react": "^1.16.0",
+>>>>>>>> origin/develop:frontend/pasang frontend/frontend/package.json
     "react": "^19.2.6",
     "react-dom": "^19.2.6"
   },
