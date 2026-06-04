@@ -1,3 +1,4 @@
+// src/App.jsx
 import React from "react";
 import AdminDashboard from "./components/AdminDashboard";
 import "./App.css";
