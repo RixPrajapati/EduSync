@@ -8,6 +8,7 @@ const stats = [
     trendPositive: true,
     iconBg: "bg-blue-100",
     iconColor: "text-blue-600",
+    accent: "border-t-blue-400",
     icon: (
       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
@@ -22,6 +23,7 @@ const stats = [
     trendPositive: true,
     iconBg: "bg-emerald-100",
     iconColor: "text-emerald-600",
+    accent: "border-t-emerald-400",
     icon: (
       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
@@ -36,6 +38,7 @@ const stats = [
     trendPositive: true,
     iconBg: "bg-amber-100",
     iconColor: "text-amber-600",
+    accent: "border-t-amber-400",
     icon: (
       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
@@ -50,6 +53,7 @@ const stats = [
     trendPositive: null,
     iconBg: "bg-violet-100",
     iconColor: "text-violet-600",
+    accent: "border-t-violet-400",
     icon: (
       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
@@ -61,11 +65,11 @@ const stats = [
 
 function StatsCards() {
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
       {stats.map((stat, index) => (
         <div
           key={index}
-          className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-shadow"
+          className={`bg-white p-6 rounded-2xl border border-blue-50 border-t-4 ${stat.accent} shadow-sm hover:shadow-md hover:shadow-blue-100/60 transition-all duration-200`}
         >
           <div className="flex items-start justify-between mb-4">
             <p className="text-slate-500 text-sm font-medium">{stat.title}</p>
@@ -74,7 +78,9 @@ function StatsCards() {
             </div>
           </div>
           <p className="text-3xl font-bold text-slate-800">{stat.value}</p>
-          <div className={`flex items-center gap-1 text-sm mt-2 font-medium ${stat.trendPositive === true ? "text-emerald-600" : stat.trendPositive === false ? "text-red-500" : "text-slate-400"}`}>
+          <div className={`flex items-center gap-1 text-sm mt-2 font-medium ${
+            stat.trendPositive === true ? "text-emerald-600" : stat.trendPositive === false ? "text-red-500" : "text-slate-400"
+          }`}>
             {stat.trendPositive === true && (
               <svg className="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M5 10l7-7m0 0l7 7m-7-7v18" />
