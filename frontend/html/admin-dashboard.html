@@ -1,0 +1,222 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Dashboard - EduSync</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+    />
+
+    <link rel="stylesheet" href="../css/shared/variables.css" />
+    <link rel="stylesheet" href="../css/shared/reset.css" />
+    <link rel="stylesheet" href="../css/layout.css" />
+    <link rel="stylesheet" href="../css/admin-dashboard.css" />
+
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=DM+Serif+Display&display=swap");
+      body {
+        font-family: "DM Sans", sans-serif;
+      }
+      .serif {
+        font-family: "DM Serif Display", serif;
+      }
+    </style>
+  </head>
+  <body class="bg-slate-50">
+    <div class="flex min-h-screen">
+      <!-- Sidebar -->
+      <aside class="w-56 bg-white border-r border-slate-200 flex flex-col">
+        <div class="p-6 border-b">
+          <div class="flex items-center gap-3">
+            <div
+              class="w-9 h-9 bg-blue-700 rounded-xl flex items-center justify-center text-white"
+            >
+              <i class="fas fa-graduation-cap"></i>
+            </div>
+            <span class="serif text-2xl font-bold text-slate-800">EduSync</span>
+          </div>
+        </div>
+
+        <nav class="flex-1 p-4 space-y-1">
+          <a
+            href="#"
+            class="flex items-center gap-3 px-4 py-3 bg-blue-50 text-blue-700 rounded-xl font-medium"
+          >
+            <i class="fas fa-home"></i> Dashboard
+          </a>
+          <a
+            href="#"
+            class="flex items-center gap-3 px-4 py-3 hover:bg-slate-100 rounded-xl text-slate-600"
+          >
+            <i class="fas fa-users"></i> Users
+          </a>
+          <a
+            href="#"
+            class="flex items-center gap-3 px-4 py-3 hover:bg-slate-100 rounded-xl text-slate-600"
+          >
+            <i class="fas fa-chart-bar"></i> Attendance
+          </a>
+          <a
+            href="#"
+            class="flex items-center gap-3 px-4 py-3 hover:bg-slate-100 rounded-xl text-slate-600"
+          >
+            <i class="fas fa-book"></i> Courses
+          </a>
+          <a
+            href="#"
+            class="flex items-center gap-3 px-4 py-3 hover:bg-slate-100 rounded-xl text-slate-600"
+          >
+            <i class="fas fa-file-alt"></i> Assignments
+          </a>
+          <a
+            href="#"
+            class="flex items-center gap-3 px-4 py-3 hover:bg-slate-100 rounded-xl text-slate-600"
+          >
+            <i class="fas fa-money-bill"></i> Fees
+          </a>
+          <a
+            href="#"
+            class="flex items-center gap-3 px-4 py-3 hover:bg-slate-100 rounded-xl text-slate-600"
+          >
+            <i class="fas fa-bullhorn"></i> Notices
+          </a>     
+        </nav>
+
+        <div class="p-4 border-t">
+          <div class="flex items-center gap-3">
+            <div
+              class="w-9 h-9 bg-blue-700 rounded-full flex items-center justify-center text-white font-semibold"
+            >
+              AD
+            </div>
+            <div>
+              <p class="font-medium text-sm">Admin</p>
+              <p class="text-xs text-slate-500">admin@edusync.edu</p>
+            </div>
+          </div>
+        </div>
+      </aside>
+
+      <!-- Main Content -->
+      <div class="flex-1">
+        <!-- Top Navbar -->
+        <header
+          class="bg-white border-b px-8 py-4 flex items-center justify-between"
+        >
+          <div>
+            <h1 class="serif text-3xl text-slate-800">
+              Institutional Dashboard
+            </h1>
+            <p class="text-slate-500 text-sm">Welcome back,Admin</p>
+          </div>
+
+          <div class="flex items-center gap-6">
+            <div class="relative">
+              <input
+                type="text"
+                placeholder="Search students, records..."
+                class="w-80 pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl focus:outline-none focus:border-blue-500"
+              />
+              <i class="fas fa-search absolute left-4 top-4 text-slate-400"></i>
+            </div>
+
+            <button
+              onclick="alert('New Student form coming soon!')"
+              class="bg-blue-600 text-white px-5 py-3 rounded-2xl flex items-center gap-2 hover:bg-blue-700"
+            >
+              <i class="fas fa-plus"></i> Add Student
+            </button>
+          </div>
+        </header>
+
+        <div class="p-8">
+          <!-- Stats -->
+          <div class="grid grid-cols-4 gap-6 mb-8">
+            <div class="bg-white p-6 rounded-3xl border border-slate-100">
+              <div class="flex justify-between">
+                <div>
+                  <p class="text-slate-500 text-sm">Total Students</p>
+                  <p class="text-4xl font-semibold text-slate-800 mt-2">
+                    1,200
+                  </p>
+                </div>
+                <div class="text-blue-500">👥</div>
+              </div>
+              <p class="text-emerald-600 text-sm mt-4">+5% vs last month</p>
+            </div>
+
+            <div class="bg-white p-6 rounded-3xl border border-slate-100">
+              <div class="flex justify-between">
+                <div>
+                  <p class="text-slate-500 text-sm">Total Teachers</p>
+                  <p class="text-4xl font-semibold text-slate-800 mt-2">85</p>
+                </div>
+                <div class="text-emerald-600">👨‍🏫</div>
+              </div>
+              <p class="text-emerald-600 text-sm mt-4">96% Active</p>
+            </div>
+
+            <div class="bg-white p-6 rounded-3xl border border-slate-100">
+              <div class="flex justify-between">
+                <div>
+                  <p class="text-slate-500 text-sm">Revenue</p>
+                  <p class="text-4xl font-semibold text-slate-800 mt-2">
+                    $120k
+                  </p>
+                </div>
+                <div class="text-amber-600">💰</div>
+              </div>
+              <p class="text-emerald-600 text-sm mt-4">85% Fees Collected</p>
+            </div>
+
+            <div class="bg-white p-6 rounded-3xl border border-slate-100">
+              <div class="flex justify-between">
+                <div>
+                  <p class="text-slate-500 text-sm">Total Courses</p>
+                  <p class="text-4xl font-semibold text-slate-800 mt-2">24</p>
+                </div>
+                <div class="text-violet-600">📚</div>
+              </div>
+              <p class="text-slate-500 text-sm mt-4">6 Departments</p>
+            </div>
+          </div>
+
+          <!-- Notices -->
+          <div class="bg-white rounded-3xl p-8 mb-8">
+            <div class="flex justify-between items-center mb-6">
+              <h2 class="text-xl font-semibold">
+                Recent Notices & Announcements
+              </h2>
+              <button
+                onclick="alert('Notice modal coming soon!')"
+                class="bg-blue-600 text-white px-6 py-3 rounded-2xl flex items-center gap-2"
+              >
+                <i class="fas fa-plus"></i> Publish Notice
+              </button>
+            </div>
+
+            <div class="grid grid-cols-3 gap-6">
+              <!-- Notice cards will go here -->
+              <div class="border border-slate-100 rounded-2xl p-6">
+                <span
+                  class="bg-violet-100 text-violet-700 text-xs font-semibold px-3 py-1 rounded-full"
+                  >EXAM</span
+                >
+                <h3 class="font-semibold mt-4">Mid-Term Schedule Released</h3>
+                <p class="text-slate-600 text-sm mt-2">
+                  The mid-term examination schedule for all departments has been
+                  finalized.
+                </p>
+                <p class="text-xs text-slate-400 mt-4">2 hrs ago</p>
+              </div>
+              <!-- Add more notice cards as needed -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
