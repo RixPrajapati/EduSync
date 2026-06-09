@@ -14,8 +14,11 @@ async function uploadFile(files) {
       cloudinary.uploader
         .upload_stream(
           {
-            folder: "mern-20260320",
-            allowed_formats: ["jpg", "png", "webp", "jpeg"],
+            folder: "edusync",
+            allowed_formats: ["jpg", "png", "webp", "jpeg", "pdf"],
+            resource_type: "auto",
+            type: "upload",
+            access_mode:"public"
           },
           (err, data) => {
             if (err) return reject(err);
@@ -30,5 +33,15 @@ async function uploadFile(files) {
 
   return uploadedFiles;
 }
+export const deleteFile = async (fileUrl) => {
+  if (!fileUrl) return;
+  const publicId = fileUrl.split("/").slice(-2).join("/").split(".")[0];
+  return await cloudinary.uploader.destroy(publicId);
+};
 
+export const updateFile = async (oldFileUrl, newFiles) => {
+  await deleteFile(oldFileUrl);
+  const uploaded = await uploadFile(newFiles);
+  return uploaded;
+};
 export default uploadFile;

@@ -9,6 +9,7 @@ import multer from "multer";
 import cloudinaryConnection from "./config/cloudinary.js";
 import courseRoute from "./routes/course.route.js";
 import enrollmentRoute from "./routes/enrollment.route.js";
+import assignments from "./routes/assignment.route.js";
 const app = Express();
 
 dataBaseConnection();
@@ -18,11 +19,13 @@ app.use(cookieParser());
 
 const upload = multer({ storage: multer.memoryStorage() });
 
+app.use("/api/user", upload.array("profile", 12), userRouter);
+app.use("/api/auth", upload.array("profile", 12), authRouter);
+
 app.use("/api/courses", courseRoute);
 app.use("/api/enrollment", enrollmentRoute);
 
-app.use("/api/user", upload.array("profile", 12), userRouter);
-app.use("/api/auth", upload.array("profile", 12), authRouter);
+app.use("/api/assignments", assignments);
 
 app.listen(config.port, () => {
   console.log(`Server started at ${config.port} `);
