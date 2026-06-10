@@ -31,6 +31,7 @@ const login = async (data) => {
     phone: newUser.phone,
   };
 };
+
 const register = async (data, files) => {
   const check = await User.findOne({
     $or: [{ email: data?.email }, { phone: data?.phone }],
@@ -42,7 +43,13 @@ const register = async (data, files) => {
       message: "User already present",
     };
   }
-  const uploadedFiles = await uploadFile(files);
+
+  const uploadedFiles = files ? await uploadFile(files) : [];
+
+  const profileUrls = Array.isArray(uploadedFiles)
+    ? uploadedFiles.map((file) => file.url)
+    : [];
+
   if (!data.password) {
     throw {
       status: 400,
@@ -55,7 +62,7 @@ const register = async (data, files) => {
   const newUser = await User.create({
     ...data,
     password: hashPassword,
-    profile: uploadedFiles.map((file) => file.url),
+    profile: profileUrls,
   });
   return {
     _id: newUser._id,
@@ -78,11 +85,11 @@ const register = async (data, files) => {
     faculty: newUser.faculty,
 
     //   extra for teacher
-
     department: newUser.department,
     designation: newUser.designation,
   };
 };
+
 const forgetPassword = async (email) => {
   const existUser = await User.findOne({ email });
   if (!existUser) {
