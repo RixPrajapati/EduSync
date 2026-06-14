@@ -1,5 +1,5 @@
-import { ZodError } from 'zod';
-import { ApiError } from '../utils/ApiError.js';
+import { ZodError } from "zod";
+import { ApiError } from "../utils/ApiError.js";
 
 const validation = (schema) => (req, res, next) => {
   try {
@@ -9,15 +9,15 @@ const validation = (schema) => (req, res, next) => {
   } catch (err) {
     if (err instanceof ZodError) {
       // Format Zod errors to extract message
-      const errors = err.errors.map(e => ({
-        path: e.path.join('.'),
-        message: e.message
+      const errors = err.errors.map((e) => ({
+        path: e.path.join("."),
+        message: e.message,
       }));
       next(new ApiError(400, "Validation Error", errors));
     } else {
       next(new ApiError(400, err.message));
     }
   }
-}
+};
 
 export default validation;
