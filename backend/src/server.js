@@ -12,6 +12,7 @@ import { logger } from "./utils/logger.js";
 
 import swaggerUi from "swagger-ui-express";
 import swaggerSpecs from "./docs/swagger.js";
+import attendanceRoute from "./routes/attendance.route.js";
 
 const app = Express();
 
@@ -24,7 +25,7 @@ const upload = multer({ storage: multer.memoryStorage() });
 
 app.use("/api/user", upload.array("profile", 12), userRouter);
 app.use("/api/auth", upload.array("profile", 12), authRouter);
-app.use("/api/attendance", attendance);
+app.use("/api/attendance", attendanceRoute);
 
 // Swagger documentation
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpecs));
