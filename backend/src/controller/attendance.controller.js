@@ -4,8 +4,8 @@ import {
   getAttendancePercentageService,
 } from "../service/attendance.service.js";
 
-import ApiResponse from "../utils/apiResponse.js";
-import ApiError from "../utils/ApiError.js";
+import {ApiResponse} from "../utils/apiResponse.js";
+import {ApiError} from "../utils/ApiError.js";
 
 export const markAttendance = async (
   req,
@@ -16,7 +16,7 @@ export const markAttendance = async (
     const attendance =
       await createAttendanceService({
         ...req.body,
-        teacherId: req.user._id,
+        teacherId: req.token.id,
       });
 
     return res.status(201).json(

@@ -9,6 +9,14 @@ const router = express.Router();
 
 router.get("/", verifyToken, courseController.getAllCourses);
 
+router.get("/semester/:semester", verifyToken, courseController.getCourseBySem);
+
+router.get(
+  "/teacher/:teacherId",
+  verifyToken,
+  courseController.getCourseByTeacher,
+);
+
 router.post(
   "/",
   verifyToken,
@@ -30,14 +38,6 @@ router.delete(
   verifyToken,
   allowRoles(ADMIN),
   courseController.deleteCourse,
-);
-
-router.get("/semester/:semester", verifyToken, courseController.getCourseBySem);
-
-router.get(
-  "/teacher/:teacherId",
-  verifyToken,
-  courseController.getCourseByTeacher,
 );
 
 export default router;

@@ -9,7 +9,7 @@ const validation = (schema) => (req, res, next) => {
   } catch (err) {
     if (err instanceof ZodError) {
       // Format Zod errors to extract message
-      const errors = err.errors.map((e) => ({
+      const errors = (err.issues || []).map((e) => ({
         path: e.path.join("."),
         message: e.message,
       }));

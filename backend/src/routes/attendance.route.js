@@ -1,4 +1,5 @@
 import express from "express";
+import {verifyToken} from "../middleware/auth.js"
 
 import {
   markAttendance,
@@ -9,10 +10,10 @@ import {
 
 const router = express.Router();
 
-router.post("/mark", markAttendance);
+router.post("/mark", verifyToken,markAttendance);
 
-router.get("/student/:studentId", getStudentAttendance);
+router.get("/student/:studentId", verifyToken,getStudentAttendance);
 
-router.get("/percentage/:studentId", getAttendancePercentage);
+router.get("/percentage/:studentId", verifyToken,getAttendancePercentage);
 
 export default router;

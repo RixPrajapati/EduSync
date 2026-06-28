@@ -51,3 +51,36 @@
 2026-06-06 23:08:11 INFO: Server started at 8000
 2026-06-14 12:36:11 INFO: Server started at 8000
 2026-06-14 12:38:49 INFO: Server started at 8000
+2026-06-14 14:02:58 INFO: Server started at 8000
+2026-06-14 15:16:18 ERROR: Cannot read properties of undefined (reading 'map') - /api/auth/login - POST - ::1
+2026-06-14 15:16:32 ERROR: Cannot read properties of undefined (reading 'map') - /api/auth/login - POST - ::1
+2026-06-14 15:17:24 INFO: Server started at 8000
+2026-06-14 15:19:19 INFO: Server started at 8000
+2026-06-14 15:20:36 INFO: Server started at 8000
+2026-06-14 15:21:00 INFO: Server started at 8000
+2026-06-14 15:22:12 INFO: Server started at 8000
+2026-06-14 15:22:15 ERROR: Validation Error - /api/auth/login - POST - ::1
+2026-06-14 15:24:30 INFO: Server started at 8000
+2026-06-14 15:24:56 INFO: Server started at 8000
+2026-06-14 15:24:59 INFO: Server started at 8000
+2026-06-14 15:25:02 ERROR: Validation Error - /api/auth/login - POST - ::1
+2026-06-14 15:25:11 INFO: Server started at 8000
+2026-06-14 15:25:50 INFO: Server started at 8000
+2026-06-14 15:27:29 ERROR: Validation Error - /api/auth/login - POST - ::1
+2026-06-14 15:33:55 INFO: Server started at 8000
+2026-06-27 23:59:42 INFO: Server started at 8000
+2026-06-28 00:01:19 ERROR: Validation Error - /api/auth/register - POST - ::1
+2026-06-28 00:10:28 INFO: Server started at 8000
+2026-06-28 00:11:05 INFO: Server started at 8000
+2026-06-28 00:11:14 INFO: Server started at 8000
+2026-06-28 00:11:51 ERROR: Cannot read properties of undefined (reading '_id') - /api/attendance/mark - POST - ::1
+2026-06-28 00:12:33 INFO: Server started at 8000
+2026-06-28 00:12:36 ERROR: Cannot read properties of undefined (reading '_id') - /api/attendance/mark - POST - ::1
+2026-06-28 00:12:41 INFO: Server started at 8000
+2026-06-28 00:13:39 INFO: Server started at 8000
+2026-06-28 00:13:40 INFO: Server started at 8000
+2026-06-28 05:21:29 INFO: Server started at 8000
+2026-06-28 05:34:44 ERROR: Validation Error - /api/marks - POST - ::1
+2026-06-28 05:37:02 ERROR: Validation Error - /api/marks - POST - ::1
+2026-06-28 05:37:28 ERROR: Student not found - /api/marks - POST - ::1
+2026-06-28 05:37:49 ERROR: Student not found - /api/marks - POST - ::1
