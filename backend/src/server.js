@@ -9,6 +9,7 @@ import multer from 'multer';
 import cloudinaryConnection from './config/cloudinary.js';
 import { errorHandler } from './middleware/errorHandler.js';
 import { logger } from './utils/logger.js';
+import cors from "cors";
 
 import swaggerUi from 'swagger-ui-express';
 import swaggerSpecs from './docs/swagger.js';
@@ -19,7 +20,7 @@ dataBaseConnection()
 cloudinaryConnection()
 app.use(bodyParser.json())
 app.use(cookieParser())
-
+app.use(cors());
 
 const upload = multer({ storage:multer.memoryStorage() })
 

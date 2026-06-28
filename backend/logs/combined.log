@@ -1,3 +1,17 @@
 2026-06-02 14:49:12 INFO: Server started at 8000
 2026-06-02 14:54:21 INFO: Server started at 8000
 2026-06-02 14:54:24 INFO: Server started at 8000
+2026-06-28 15:26:45 INFO: Server started at 8080
+2026-06-28 15:29:30 INFO: Server started at 8080
+2026-06-28 15:30:13 INFO: Server started at 8080
+2026-06-28 15:30:43 INFO: Server started at 8080
+2026-06-28 16:02:59 INFO: Server started at 8080
+2026-06-28 16:05:14 INFO: Server started at 8080
+2026-06-28 16:10:40 INFO: Server started at 8080
+2026-06-28 16:55:51 INFO: Server started at 8080
+2026-06-28 19:59:03 INFO: Server started at 8080
+2026-06-28 21:34:40 INFO: Server started at 8080
+2026-06-28 21:44:57 ERROR: Cannot read properties of undefined (reading 'map') - /api/auth/register - POST - ::1
+2026-06-28 21:46:51 INFO: Server started at 8080
+2026-06-28 21:46:55 ERROR: Cannot read properties of undefined (reading 'map') - /api/auth/register - POST - ::1
+2026-06-28 21:51:41 ERROR: Cannot read properties of undefined (reading 'map') - /api/auth/register - POST - ::1
