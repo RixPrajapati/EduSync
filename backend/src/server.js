@@ -10,6 +10,7 @@ import cloudinaryConnection from './config/cloudinary.js';
 import { errorHandler } from './middleware/errorHandler.js';
 import { logger } from './utils/logger.js';
 import cors from "cors";
+import noticeRouter from "./routes/notice.route.js"
 
 import swaggerUi from 'swagger-ui-express';
 import swaggerSpecs from './docs/swagger.js';
@@ -28,7 +29,8 @@ const upload = multer({ storage:multer.memoryStorage() })
 
 app.use("/api/user",upload.array('profile', 12),userRouter)
 app.use("/api/auth",upload.array('profile', 12),authRouter)
-
+// notice apis 
+app.use("/api/notice",noticeRouter)
 // Swagger documentation
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpecs));
 
