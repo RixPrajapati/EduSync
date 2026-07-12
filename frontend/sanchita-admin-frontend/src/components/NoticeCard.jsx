@@ -1,35 +1,43 @@
-import React from "react";
-
-function NoticeCard({ notice }) {
+function NoticeCard({ notice, onDelete }) {
   const categoryColors = {
     violet: "bg-violet-100 text-violet-700",
-    blue: "bg-blue-100 text-blue-700",
-    red: "bg-red-100 text-red-700",
-    green: "bg-emerald-100 text-emerald-700",
-    amber: "bg-amber-100 text-amber-700",
+    blue:   "bg-blue-100 text-blue-700",
+    red:    "bg-red-100 text-red-700",
+    green:  "bg-emerald-100 text-emerald-700",
+    amber:  "bg-amber-100 text-amber-700",
   };
 
   const borderAccents = {
     violet: "border-l-violet-400",
-    blue: "border-l-blue-400",
-    red: "border-l-red-400",
-    green: "border-l-emerald-400",
-    amber: "border-l-amber-400",
+    blue:   "border-l-blue-400",
+    red:    "border-l-red-400",
+    green:  "border-l-emerald-400",
+    amber:  "border-l-amber-400",
   };
 
-  const accent = borderAccents[notice.categoryColor] || borderAccents.blue;
+  const accent = borderAccents[notice.categoryColor] ?? borderAccents.blue;
 
   return (
-    <div className={`bg-blue-50/50 border border-blue-50 border-l-4 ${accent} rounded-2xl p-5 hover:shadow-md hover:shadow-blue-100/60 hover:bg-white hover:-translate-y-0.5 transition-all duration-200 cursor-pointer`}>
-      <span className={`${categoryColors[notice.categoryColor] || categoryColors.blue} text-xs font-semibold px-3 py-1 rounded-full`}>
-        {notice.category}
-      </span>
-      <h3 className="font-semibold text-slate-800 mt-4 text-base">
-        {notice.title}
-      </h3>
-      <p className="text-slate-500 text-sm mt-2 line-clamp-2">
-        {notice.description}
-      </p>
+    <div className={`group relative bg-blue-50/50 border border-blue-50 border-l-4 ${accent} rounded-2xl p-5 hover:shadow-md hover:shadow-blue-100/60 hover:bg-white hover:-translate-y-0.5 transition-all duration-200`}>
+      <div className="flex items-start justify-between gap-2">
+        <span className={`${categoryColors[notice.categoryColor] ?? categoryColors.blue} text-xs font-semibold px-3 py-1 rounded-full`}>
+          {notice.category}
+        </span>
+        {onDelete && (
+          <button
+            onClick={() => onDelete(notice.id)}
+            className="w-6 h-6 rounded-lg flex items-center justify-center text-slate-300 hover:text-red-400 hover:bg-red-50 transition-all opacity-0 group-hover:opacity-100 shrink-0"
+            title="Delete notice"
+          >
+            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
+                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+            </svg>
+          </button>
+        )}
+      </div>
+      <h3 className="font-semibold text-slate-800 mt-4 text-base">{notice.title}</h3>
+      <p className="text-slate-500 text-sm mt-2 line-clamp-2">{notice.description}</p>
       <p className="text-xs text-slate-400 mt-4 flex items-center gap-1">
         <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"

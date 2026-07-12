@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect } from "react";
 
 const initialTransactions = [
   { id: "TXN-1001", student: "Rahul Poudel", type: "Student", amount: 500, date: "Jun 04, 2026", status: "Paid" },
@@ -94,9 +94,63 @@ function RecordPaymentModal({ onClose, onSave }) {
   );
 }
 
+function ReceiptModal({ txn, onClose }) {
+  return (
+    <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-2xl shadow-2xl border border-slate-100 w-full max-w-sm overflow-hidden">
+        <div className="bg-gradient-to-r from-emerald-600 to-teal-500 px-6 py-5">
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="text-base font-bold text-white">Payment Receipt</h3>
+              <p className="text-xs text-white/70 mt-0.5">{txn.id}</p>
+            </div>
+            <button
+              onClick={onClose}
+              className="w-7 h-7 rounded-lg bg-white/20 hover:bg-white/30 flex items-center justify-center text-white transition-colors"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+        </div>
+        <div className="p-6 space-y-3">
+          {[
+            { label: "Student / Staff", value: txn.student },
+            { label: "Type",            value: txn.type    },
+            { label: "Amount",          value: `$${txn.amount.toLocaleString()}` },
+            { label: "Date",            value: txn.date    },
+          ].map(({ label, value }) => (
+            <div key={label} className="flex items-center justify-between py-2 border-b border-slate-100 last:border-0">
+              <span className="text-xs font-semibold text-slate-400 uppercase tracking-wide">{label}</span>
+              <span className="text-sm font-semibold text-slate-800">{value}</span>
+            </div>
+          ))}
+          <div className="flex items-center justify-between py-2">
+            <span className="text-xs font-semibold text-slate-400 uppercase tracking-wide">Status</span>
+            <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold ${statusConfig[txn.status].badge}`}>
+              <span className={`w-1.5 h-1.5 rounded-full ${statusConfig[txn.status].dot}`} />
+              {txn.status}
+            </span>
+          </div>
+        </div>
+        <div className="px-6 pb-6">
+          <button
+            onClick={onClose}
+            className="w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold active:scale-95 transition-all shadow-sm"
+          >
+            Close
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function FeeCollectionSection() {
   const [transactions, setTransactions] = useState(initialTransactions);
   const [showModal, setShowModal] = useState(false);
+  const [viewingReceipt, setViewingReceipt] = useState(null);
   const [showExportMenu, setShowExportMenu] = useState(false);
   const exportRef = useRef(null);
 
@@ -264,7 +318,10 @@ function FeeCollectionSection() {
                     </span>
                   </td>
                   <td className="py-3 px-4">
-                    <button className="text-blue-600 hover:text-blue-700 hover:bg-blue-50 text-xs font-semibold px-2.5 py-1 rounded-lg border border-blue-100 transition-colors">
+                    <button
+                      onClick={() => setViewingReceipt(txn)}
+                      className="text-blue-600 hover:text-blue-700 hover:bg-blue-50 text-xs font-semibold px-2.5 py-1 rounded-lg border border-blue-100 transition-colors"
+                    >
                       View Receipt
                     </button>
                   </td>
@@ -276,6 +333,7 @@ function FeeCollectionSection() {
       </div>
 
       {showModal && <RecordPaymentModal onClose={() => setShowModal(false)} onSave={handleSave} />}
+      {viewingReceipt && <ReceiptModal txn={viewingReceipt} onClose={() => setViewingReceipt(null)} />}
     </>
   );
 }

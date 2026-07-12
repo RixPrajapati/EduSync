@@ -47,6 +47,7 @@ function App() {
               <SupportCard />
             </div>
           </div>
+          
         </main>
       </div>
     </div>
