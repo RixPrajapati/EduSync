@@ -18,7 +18,9 @@ const errorHandler = (err, req, res, next) => {
   };
 
   // Log the error
-  logger.error(`${error.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
+  logger.error(
+    `${error.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`,
+  );
 
   return res.status(error.statusCode).json(response);
 };

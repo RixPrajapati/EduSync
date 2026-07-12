@@ -4,15 +4,15 @@
 2026-06-06 22:13:44 ERROR: Cannot read properties of undefined (reading 'map') - /api/user/addUser - POST - ::1
 2026-06-06 22:14:04 ERROR: Cannot read properties of undefined (reading 'map') - /api/user/addUser - POST - ::1
 2026-06-06 22:14:06 ERROR: Cannot read properties of undefined (reading 'map') - /api/user/addUser - POST - ::1
-2026-06-06 22:15:39 ERROR: Cannot read properties of undefined (reading 'map') - /api/user/addUser - POST - ::1
-2026-06-06 22:16:56 ERROR: Cannot read properties of undefined (reading 'map') - /api/user/addUser - POST - ::1
-2026-06-06 22:16:58 ERROR: Cannot read properties of undefined (reading 'map') - /api/user/addUser - POST - ::1
-2026-06-06 22:22:34 ERROR: Cannot read properties of undefined (reading 'map') - /api/user/addUser - POST - ::1
-2026-06-06 22:22:36 ERROR: Cannot read properties of undefined (reading 'map') - /api/user/addUser - POST - ::1
-2026-06-06 22:25:36 ERROR: Cannot read properties of undefined (reading 'map') - /api/user/addUser - POST - ::1
-2026-06-06 22:27:40 ERROR: Cannot read properties of undefined (reading 'map') - /api/user/addUser - POST - ::1
-2026-06-06 22:27:43 ERROR: Cannot read properties of undefined (reading 'map') - /api/user/addUser - POST - ::1
-2026-06-06 22:27:44 ERROR: Cannot read properties of undefined (reading 'map') - /api/user/addUser - POST - ::1
-2026-06-06 22:27:45 ERROR: Cannot read properties of undefined (reading 'map') - /api/user/addUser - POST - ::1
-2026-06-06 22:32:13 ERROR: Cannot read properties of undefined (reading 'map') - /api/user/addUser - POST - ::1
-2026-06-06 22:32:16 ERROR: Cannot read properties of undefined (reading 'map') - /api/user/addUser - POST - ::1
+2026-06-06 22:15:39 ERROR: Cannot read properties of undefined (reading 'map') - /api/user/addUser - POST - ::12026-06-14 15:16:18 ERROR: Cannot read properties of undefined (reading 'map') - /api/auth/login - POST - ::1
+2026-06-14 15:16:32 ERROR: Cannot read properties of undefined (reading 'map') - /api/auth/login - POST - ::1
+2026-06-14 15:22:15 ERROR: Validation Error - /api/auth/login - POST - ::1
+2026-06-14 15:25:02 ERROR: Validation Error - /api/auth/login - POST - ::1
+2026-06-14 15:27:29 ERROR: Validation Error - /api/auth/login - POST - ::1
+2026-06-28 00:01:19 ERROR: Validation Error - /api/auth/register - POST - ::1
+2026-06-28 00:11:51 ERROR: Cannot read properties of undefined (reading '_id') - /api/attendance/mark - POST - ::1
+2026-06-28 00:12:36 ERROR: Cannot read properties of undefined (reading '_id') - /api/attendance/mark - POST - ::1
+2026-06-28 05:34:44 ERROR: Validation Error - /api/marks - POST - ::1
+2026-06-28 05:37:02 ERROR: Validation Error - /api/marks - POST - ::1
+2026-06-28 05:37:28 ERROR: Student not found - /api/marks - POST - ::1
+2026-06-28 05:37:49 ERROR: Student not found - /api/marks - POST - ::1
