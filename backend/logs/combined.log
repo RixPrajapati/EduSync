@@ -84,3 +84,5 @@
 2026-06-28 05:37:02 ERROR: Validation Error - /api/marks - POST - ::1
 2026-06-28 05:37:28 ERROR: Student not found - /api/marks - POST - ::1
 2026-06-28 05:37:49 ERROR: Student not found - /api/marks - POST - ::1
+2026-06-28 05:55:22 INFO: Server started at 8000
+2026-06-28 12:12:41 INFO: Server started at 8000
