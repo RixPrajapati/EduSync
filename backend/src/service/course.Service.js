@@ -13,7 +13,7 @@ const getCourseById = async (courseId) => {
 
 const createCourse = async (data) => {
   const existing = await Course.findOne({
-    courseCode: data.courseCode.toUpperCase,
+    courseCode: data.courseCode.toUpperCase(),
   });
   if (existing) throw new Error();
   const course = await Course.create(data);

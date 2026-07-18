@@ -2,8 +2,6 @@ import { mailRex } from "../../constants/regex.js";
 import userSchema from "./user.schemas.js";
 import z from "zod";
 
-
-
 export const loginSchema = z
   .object({
     email: z
@@ -20,4 +18,3 @@ export const loginSchema = z
   });
 
 export const registerSchema = userSchema;
-

@@ -1,4 +1,4 @@
-import courseService from "../service/course.Service.js";
+import courseService from "../service/course.service.js";
 
 const getAllCourses = async (req, res) => {
   try {

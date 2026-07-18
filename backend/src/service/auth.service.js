@@ -95,7 +95,7 @@ const forgetPassword = async (email) => {
   if (!existUser) {
     throw {
       status: 404,
-      message: "User of this user is not exist ",
+      message: "Reset password link send  to your emil address",
     };
   }
   const token = crypto.randomUUID();
