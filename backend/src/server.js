@@ -10,30 +10,39 @@ import cloudinaryConnection from './config/cloudinary.js';
 import { errorHandler } from './middleware/errorHandler.js';
 import { logger } from './utils/logger.js';
 import cors from "cors";
+import noticeRouter from "./routes/notice.route.js"
 
-import swaggerUi from 'swagger-ui-express';
-import swaggerSpecs from './docs/swagger.js';
+import swaggerUi from "swagger-ui-express";
+import swaggerSpecs from "./docs/swagger.js";
+import attendanceRouter from "./routes/attendance.route.js";
+import courseRouter from "./routes/course.route.js";
+import marksRouter from "./routes/marks.route.js";
 
-const app=Express();
+const app = Express();
 
-dataBaseConnection()
-cloudinaryConnection()
-app.use(bodyParser.json())
-app.use(cookieParser())
+dataBaseConnection();
+cloudinaryConnection();
+app.use(bodyParser.json());
+app.use(cookieParser());
 app.use(cors());
 
-const upload = multer({ storage:multer.memoryStorage() })
+const upload = multer({ storage: multer.memoryStorage() });
 
+app.use("/api/user", upload.array("profile", 12), userRouter);
+app.use("/api/auth", upload.array("profile", 12), authRouter);
+app.use("/api/attendance", attendanceRouter);
+app.use("/api/course", courseRouter);
+app.use("/api/marks", marksRouter);
 
-
-app.use("/api/user",upload.array('profile', 12),userRouter)
-app.use("/api/auth",upload.array('profile', 12),authRouter)
+// notice apis 
+app.use("/api/notice",noticeRouter)
 
 // Swagger documentation
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpecs));
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpecs));
 
 app.use(errorHandler);
 
-app.listen(config.port,()=>{
-    logger.info(`Server started at ${config.port}`);
-})
+app.listen(config.port, () => {
+  console.log(`Server started at ${config.port}`);
+  logger.info(`Server started at ${config.port}`);
+});
