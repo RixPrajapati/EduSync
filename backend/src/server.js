@@ -16,6 +16,13 @@ import attendanceRouter from "./routes/attendance.route.js";
 import courseRouter from "./routes/course.route.js";
 import marksRouter from "./routes/marks.route.js";
 
+import authRoute from "./routes/auth.routes.js"
+import userRoute from "./routes/user.routes.js"
+import teacherRoutes from "./routes/teacher.routes.js"
+import studentRoute from "./routes/student.routes.js";
+import timetableRoute from "./routes/timetable.routes.js"
+
+
 const app = Express();
 
 dataBaseConnection();
@@ -30,6 +37,12 @@ app.use("/api/auth", upload.array("profile", 12), authRouter);
 app.use("/api/attendance", attendanceRouter);
 app.use("/api/course", courseRouter);
 app.use("/api/marks", marksRouter);
+
+app.use("/api/auth", authRoute);
+app.use("/api/users", userRoute);
+app.use("/api/teachers", teacherRoutes);
+app.use("/api/students", studentRoute);
+app.use("/api/timetables", timetableRoute);
 
 // Swagger documentation
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpecs));
