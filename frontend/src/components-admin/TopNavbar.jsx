@@ -1,8 +1,6 @@
-import React from "react";
-
 const today = new Date().toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric", year: "numeric" });
 
-function TopNavbar({ onMenuClick }) {
+function TopNavbar({ onMenuClick, onAddStudent }) {
   return (
     <header className="sticky top-0 z-30 bg-white border-b border-blue-100 px-6 py-4 flex items-center justify-between">
       <div className="flex items-center gap-3">
@@ -47,7 +45,7 @@ function TopNavbar({ onMenuClick }) {
 
         {/* Add Student */}
         <button
-          onClick={() => alert("New Student form coming soon!")}
+          onClick={onAddStudent}
           className="bg-blue-600 text-white px-4 py-2.5 rounded-xl flex items-center gap-2 hover:bg-blue-700 transition-colors shadow-sm shadow-blue-200 text-sm font-medium"
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
