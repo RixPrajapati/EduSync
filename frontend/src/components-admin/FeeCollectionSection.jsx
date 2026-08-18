@@ -1,12 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-
-const initialTransactions = [
-  { id: "TXN-1001", student: "Rahul Poudel", type: "Student", amount: 500, date: "Jun 04, 2026", status: "Paid" },
-  { id: "TXN-1002", student: "Priya Karki", type: "Student", amount: 500, date: "Jun 03, 2026", status: "Paid" },
-  { id: "TXN-1003", student: "Ananya Singh", type: "Student", amount: 250, date: "Jun 02, 2026", status: "Pending" },
-  { id: "TXN-1004", student: "Arjun Khanal", type: "Student", amount: 500, date: "Jun 01, 2026", status: "Paid" },
-  { id: "TXN-1005", student: "Mr. Kishan Kumar", type: "Staff", amount: 120, date: "May 30, 2026", status: "Overdue" },
-];
+import { feeAPI, userAPI } from "../services/api";
 
 const statusConfig = {
   Paid:    { dot: "bg-emerald-400", badge: "bg-emerald-100 text-emerald-700" },
@@ -14,8 +7,19 @@ const statusConfig = {
   Overdue: { dot: "bg-red-400",     badge: "bg-red-100 text-red-600" },
 };
 
-function RecordPaymentModal({ onClose, onSave }) {
-  const [form, setForm] = useState({ student: "", amount: "", date: "", status: "Paid" });
+// Maps backend Fee shape -> UI shape
+const normalizeFee = (f) => ({
+  id: f._id,
+  userId: f.userId?._id ?? f.userId,
+  student: f.userId?.userName ?? "Unknown",
+  type: f.type,
+  amount: f.amount,
+  date: new Date(f.paidAt).toLocaleDateString("en-US", { month: "short", day: "2-digit", year: "numeric" }),
+  status: f.status,
+});
+
+function RecordPaymentModal({ users, onClose, onSave }) {
+  const [form, setForm] = useState({ userId: "", type: "Student", amount: "", date: "", status: "Paid" });
   const handleChange = (e) => setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
 
   return (
@@ -31,14 +35,28 @@ function RecordPaymentModal({ onClose, onSave }) {
         </div>
         <div className="flex flex-col gap-4">
           <div>
-            <label className="block text-sm font-medium text-slate-600 mb-1">Student / Staff Name</label>
-            <input
-              name="student"
-              value={form.student}
+            <label className="block text-sm font-medium text-slate-600 mb-1">Student / Staff</label>
+            <select
+              name="userId"
+              value={form.userId}
               onChange={handleChange}
-              placeholder="e.g. Rahul Poudel"
               className="w-full border border-blue-100 bg-blue-50/40 rounded-xl px-3 py-2 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-400 transition-all"
-            />
+            >
+              <option value="" disabled>Select a person</option>
+              {users.map((u) => <option key={u.id} value={u.id}>{u.name} ({u.role})</option>)}
+            </select>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-slate-600 mb-1">Type</label>
+            <select
+              name="type"
+              value={form.type}
+              onChange={handleChange}
+              className="w-full border border-blue-100 bg-blue-50/40 rounded-xl px-3 py-2 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-400 transition-all"
+            >
+              <option value="Student">Student</option>
+              <option value="Staff">Staff</option>
+            </select>
           </div>
           <div>
             <label className="block text-sm font-medium text-slate-600 mb-1">Amount ($)</label>
@@ -84,7 +102,8 @@ function RecordPaymentModal({ onClose, onSave }) {
           </button>
           <button
             onClick={() => onSave(form)}
-            className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-xl shadow-sm shadow-blue-200 transition-colors"
+            disabled={!form.userId || !form.amount}
+            className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-50 rounded-xl shadow-sm shadow-blue-200 transition-colors"
           >
             Save Payment
           </button>
@@ -148,11 +167,28 @@ function ReceiptModal({ txn, onClose }) {
 }
 
 function FeeCollectionSection() {
-  const [transactions, setTransactions] = useState(initialTransactions);
+  const [transactions, setTransactions] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [users, setUsers] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [viewingReceipt, setViewingReceipt] = useState(null);
   const [showExportMenu, setShowExportMenu] = useState(false);
   const exportRef = useRef(null);
+
+  const fetchFees = () => {
+    setLoading(true);
+    feeAPI.getAll()
+      .then((data) => setTransactions(data.map(normalizeFee)))
+      .catch((err) => setError(err.response?.data?.message ?? err.message))
+      .finally(() => setLoading(false));
+  };
+
+  useEffect(fetchFees, []);
+
+  useEffect(() => {
+    userAPI.getAll().then(setUsers).catch(() => setUsers([]));
+  }, []);
 
   useEffect(() => {
     const handler = (e) => {
@@ -193,25 +229,49 @@ function FeeCollectionSection() {
   const totalPending   = transactions.filter((t) => t.status === "Pending").reduce((s, t) => s + t.amount, 0);
   const totalOverdue   = transactions.filter((t) => t.status === "Overdue").reduce((s, t) => s + t.amount, 0);
 
-  const handleSave = (form) => {
-    if (!form.student || !form.amount) return;
-    const dateLabel = form.date
-      ? new Date(form.date).toLocaleDateString("en-US", { month: "short", day: "2-digit", year: "numeric" })
-      : "—";
-    const newTxn = {
-      id: `TXN-${1000 + transactions.length + 1}`,
-      student: form.student,
-      type: "Student",
-      amount: Number(form.amount),
-      date: dateLabel,
-      status: form.status,
-    };
-    setTransactions((prev) => [newTxn, ...prev]);
-    setShowModal(false);
+  const extractError = (err) =>
+    typeof err.response?.data === "string" ? err.response.data : err.response?.data?.message ?? err.message;
+
+  const handleSave = async (form) => {
+    try {
+      await feeAPI.create({
+        userId: form.userId,
+        type: form.type,
+        amount: Number(form.amount),
+        status: form.status,
+        paidAt: form.date ? new Date(form.date).toISOString() : undefined,
+      });
+      setShowModal(false);
+      fetchFees();
+    } catch (err) {
+      setError(extractError(err));
+      setShowModal(false);
+    }
   };
+
+  const handleDelete = async (id) => {
+    try {
+      await feeAPI.remove(id);
+      fetchFees();
+    } catch (err) {
+      setError(extractError(err));
+    }
+  };
+
+  if (loading) return (
+    <div className="bg-white rounded-2xl border border-blue-50 shadow-sm p-6 mb-8">
+      <p className="text-sm text-slate-400 text-center py-10">Loading fee records…</p>
+    </div>
+  );
 
   return (
     <>
+      {error && (
+        <div className="bg-red-50 border border-red-100 text-red-600 text-sm rounded-xl px-4 py-3 mb-4 flex items-start justify-between gap-3">
+          <span>{error}</span>
+          <button onClick={() => setError(null)} className="text-red-400 hover:text-red-600 shrink-0">✕</button>
+        </div>
+      )}
       <div className="bg-white rounded-2xl border border-blue-50 shadow-sm p-6 mb-8">
         {/* Header */}
         <div className="flex justify-between items-center mb-6">
@@ -300,9 +360,11 @@ function FeeCollectionSection() {
               </tr>
             </thead>
             <tbody>
-              {transactions.map((txn) => (
+              {transactions.length === 0 ? (
+                <tr><td colSpan="6" className="text-center py-8 text-slate-400">No fee records yet.</td></tr>
+              ) : transactions.map((txn) => (
                 <tr key={txn.id} className="border-b border-blue-50 hover:bg-blue-50/40 transition-colors">
-                  <td className="py-3 px-4 text-slate-400 text-sm font-mono">{txn.id}</td>
+                  <td className="py-3 px-4 text-slate-400 text-sm font-mono">{txn.id.slice(-8)}</td>
                   <td className="py-3 px-4">
                     <div>
                       <p className="text-slate-800 font-medium text-sm">{txn.student}</p>
@@ -320,9 +382,15 @@ function FeeCollectionSection() {
                   <td className="py-3 px-4">
                     <button
                       onClick={() => setViewingReceipt(txn)}
-                      className="text-blue-600 hover:text-blue-700 hover:bg-blue-50 text-xs font-semibold px-2.5 py-1 rounded-lg border border-blue-100 transition-colors"
+                      className="text-blue-600 hover:text-blue-700 hover:bg-blue-50 text-xs font-semibold px-2.5 py-1 rounded-lg border border-blue-100 transition-colors mr-2"
                     >
                       View Receipt
+                    </button>
+                    <button
+                      onClick={() => handleDelete(txn.id)}
+                      className="text-red-500 hover:text-red-700 text-xs font-semibold px-2.5 py-1 rounded-lg border border-red-100 transition-colors"
+                    >
+                      Delete
                     </button>
                   </td>
                 </tr>
@@ -332,7 +400,7 @@ function FeeCollectionSection() {
         </div>
       </div>
 
-      {showModal && <RecordPaymentModal onClose={() => setShowModal(false)} onSave={handleSave} />}
+      {showModal && <RecordPaymentModal users={users} onClose={() => setShowModal(false)} onSave={handleSave} />}
       {viewingReceipt && <ReceiptModal txn={viewingReceipt} onClose={() => setViewingReceipt(null)} />}
     </>
   );

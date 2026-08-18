@@ -58,4 +58,12 @@ router.get(
   marksController.getStudentSummary
 );
 
+// 7. Admin Overview (grade distribution, backlogs, subject-wise averages)
+router.get(
+  "/overview",
+  verifyToken,
+  allowRoles(ADMIN, TEACHER),
+  marksController.getMarksOverview
+);
+
 export default router;

@@ -1,6 +1,6 @@
 import Teacher from "../models/Teacher.model.js";
-import User from "../models/User.model.js";
-import uploadFile from "../utils/fileUploader.js";
+import User from "../models/User.js";
+import uploadFile from "../utils/fileUploder.js";
 
 const createTeacher = async (data, file) => {
     const { user, department, subjects, experience } = data;
@@ -22,7 +22,7 @@ const createTeacher = async (data, file) => {
     }
 
     // ✅ Validate TEACHER role
-  if (!existingUser.roles.includes("TEACHER")) {
+  if (!existingUser.role.includes("TEACHER")) {
     const error = new Error("Selected user is not a teacher.");
     error.statusCode =400;
     throw error;
@@ -105,7 +105,7 @@ const updateTeacher = async (id, data, file) => {
 
 
         // ✅ Validate TEACHER role
-    if (!user.roles.includes("TEACHER")) {
+    if (!user.role.includes("TEACHER")) {
       const error = new Error("Selected user is not a teacher.");
       error.statusCode = 400;
       throw error;

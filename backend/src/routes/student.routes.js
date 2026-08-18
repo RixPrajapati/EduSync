@@ -1,31 +1,31 @@
 import express from "express";
 
-import upload from "../middlewares/upload.js";
-import studentController from "../controllers/student.controller.js";
+import upload from "../middleware/upload.js";
+import studentController from "../controller/student.controller.js";
 
-import verifyToken from "../middlewares/verifyToken.js";
-import roleBasedAuth from "../middlewares/roleBasedAuth.js";
+import { verifyToken } from "../middleware/auth.js";
+import { allowRoles } from "../middleware/course.js";
 
-import { ROLE_ADMIN, ROLE_STUDENT, } from "../constants/roles.js";
+import { ADMIN, STUDENT } from "../constants/role.js";
 
 const router = express.Router();
 
 // Admin
-router.post( "/", verifyToken, roleBasedAuth(ROLE_ADMIN), upload.single("image"), studentController.createStudent );
+router.post( "/", verifyToken, allowRoles(ADMIN), upload.single("image"), studentController.createStudent );
 
 // Admin
-router.get( "/", verifyToken, roleBasedAuth(ROLE_ADMIN), studentController.getStudents );
+router.get( "/", verifyToken, allowRoles(ADMIN), studentController.getStudents );
 
 // Logged In
 router.get("/:id", verifyToken, studentController.getSingleStudent);
 
 // Admin
-router.put( "/:id", verifyToken, roleBasedAuth(ROLE_ADMIN), upload.single("image"), studentController.updateStudent );
+router.put( "/:id", verifyToken, allowRoles(ADMIN), upload.single("image"), studentController.updateStudent );
 
 // Admin
-router.delete( "/:id", verifyToken, roleBasedAuth(ROLE_ADMIN), studentController.deleteStudent );
+router.delete( "/:id", verifyToken, allowRoles(ADMIN), studentController.deleteStudent );
 
 // Student/Admin
-router.put( "/:id/profile-image", verifyToken, roleBasedAuth(ROLE_ADMIN, ROLE_STUDENT), upload.single("image"), studentController.updateProfileImage );
+router.put( "/:id/profile-image", verifyToken, allowRoles(ADMIN, STUDENT), upload.single("image"), studentController.updateProfileImage );
 
 export default router;

@@ -21,6 +21,8 @@ import marksRouter from "./routes/marks.route.js";
 import teacherRoutes from "./routes/teacher.routes.js"
 import studentRoute from "./routes/student.routes.js";
 import timetableRoute from "./routes/timetable.routes.js"
+import assignmentRoute from "./routes/assignment.route.js"
+import feeRoute from "./routes/fee.route.js"
 
 
 const app = Express();
@@ -42,6 +44,9 @@ app.use("/api/marks", marksRouter);
 app.use("/api/teachers", teacherRoutes);
 app.use("/api/students", studentRoute);
 app.use("/api/timetables", timetableRoute);
+app.use("/api/notice", noticeRouter);
+app.use("/api/assignments", assignmentRoute);
+app.use("/api/fees", feeRoute);
 
 // Swagger documentation
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpecs));

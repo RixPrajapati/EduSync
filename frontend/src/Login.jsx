@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { 
+import { authAPI } from './services/api';
+import {
   Mail, 
   Lock, 
   ArrowRight, 
@@ -152,16 +153,31 @@ export default function Login() {
     }));
   };
 
-  const handleSignInSubmit = (e) => {
+  const handleSignInSubmit = async (e) => {
     e.preventDefault();
     if (!formData.email || !formData.password) {
       triggerNotification("Please provide both valid email & password.", "warning");
       return;
     }
     triggerNotification("Authenticating...", "success");
-    setTimeout(() => {
-      navigate('/dashboard');
-    }, 1500);
+    try {
+      const user = await authAPI.login(formData.email, formData.password);
+      localStorage.setItem("token", user.token);
+      localStorage.setItem("user", JSON.stringify(user));
+
+      const role = user.role?.[0] ?? "STUDENT";
+      const destination =
+        role === "ADMIN" ? "/admin-dashboard" :
+        role === "TEACHER" ? "/teacher-dashboard" :
+        "/dashboard";
+
+      navigate(destination);
+    } catch (err) {
+      const message = typeof err.response?.data === "string"
+        ? err.response.data
+        : err.response?.data?.message ?? "Login failed. Please try again.";
+      triggerNotification(message, "warning");
+    }
   };
 
   return (
