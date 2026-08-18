@@ -1,6 +1,16 @@
 const today = new Date().toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric", year: "numeric" });
 
+function getCurrentUserName() {
+  try {
+    return JSON.parse(localStorage.getItem("user"))?.userName ?? "Admin";
+  } catch {
+    return "Admin";
+  }
+}
+
 function TopNavbar({ onMenuClick, onAddStudent }) {
+  const userName = getCurrentUserName();
+
   return (
     <header className="sticky top-0 z-30 bg-white border-b border-blue-100 px-6 py-4 flex items-center justify-between">
       <div className="flex items-center gap-3">
@@ -14,7 +24,7 @@ function TopNavbar({ onMenuClick, onAddStudent }) {
         </button>
         <div>
           <h1 className="text-xl font-bold text-slate-800">Institutional Dashboard</h1>
-          <p className="text-slate-400 text-sm leading-tight">Welcome back, Admin &mdash; {today}</p>
+          <p className="text-slate-400 text-sm leading-tight">Welcome back, {userName} &mdash; {today}</p>
         </div>
       </div>
 

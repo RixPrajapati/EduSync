@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import NoticeCard from "./NoticeCard";
+import { noticeAPI } from "../services/api";
 
 const CATEGORY_OPTIONS = [
   { value: "EXAM",      color: "violet" },
@@ -10,6 +11,33 @@ const CATEGORY_OPTIONS = [
 ];
 
 const CATEGORY_COLOR_MAP = Object.fromEntries(CATEGORY_OPTIONS.map((c) => [c.value, c.color]));
+
+// Backend only supports EVENT/EXAM/HOLIDAY/OTHER — IMPORTANT and GENERAL both collapse to OTHER.
+const CATEGORY_TO_BACKEND = { EXAM: "EXAM", HOLIDAY: "HOLIDAY", EVENT: "EVENT", IMPORTANT: "OTHER", GENERAL: "OTHER" };
+const BACKEND_TO_CATEGORY = { EXAM: "EXAM", HOLIDAY: "HOLIDAY", EVENT: "EVENT", OTHER: "GENERAL" };
+
+function timeAgo(dateStr) {
+  const diffMins = Math.floor((Date.now() - new Date(dateStr).getTime()) / 60000);
+  if (diffMins < 1) return "Just now";
+  if (diffMins < 60) return `${diffMins} min${diffMins !== 1 ? "s" : ""} ago`;
+  const diffHrs = Math.floor(diffMins / 60);
+  if (diffHrs < 24) return `${diffHrs} hr${diffHrs !== 1 ? "s" : ""} ago`;
+  const diffDays = Math.floor(diffHrs / 24);
+  return `${diffDays} day${diffDays !== 1 ? "s" : ""} ago`;
+}
+
+// Maps backend Notice shape → UI shape
+const normalizeNotice = (n) => {
+  const category = BACKEND_TO_CATEGORY[n.noticeTyped] ?? "GENERAL";
+  return {
+    id: n._id ?? n.id,
+    category,
+    categoryColor: CATEGORY_COLOR_MAP[category] ?? "amber",
+    title: n.title,
+    description: n.description,
+    time: timeAgo(n.publishedAt ?? n.createdAt ?? Date.now()),
+  };
+};
 
 const initialNotices = [
   {
@@ -129,10 +157,26 @@ function AddNoticeModal({ onClose, onSave }) {
 }
 
 function NoticesSection() {
-  const [notices, setNotices] = useState(initialNotices);
+  const [notices, setNotices] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [showAddModal, setShowAddModal] = useState(false);
   const [showExportMenu, setShowExportMenu] = useState(false);
   const exportRef = useRef(null);
+
+  // Fetch notices from API on mount; fall back to mock data if backend is unreachable
+  useEffect(() => {
+    noticeAPI.getAll()
+      .then((data) => setNotices(data.map(normalizeNotice)))
+      .catch((err) => {
+        if (!err.response) {
+          setNotices(initialNotices);
+        } else {
+          setError(err.message);
+        }
+      })
+      .finally(() => setLoading(false));
+  }, []);
 
   useEffect(() => {
     const handler = (e) => {
@@ -167,27 +211,40 @@ function NoticesSection() {
     }
   };
 
-  const handleAddNotice = (form) => {
-    setNotices((prev) => [
-      {
-        id: Date.now() + Math.floor(Math.random() * 9999),
-        category: form.category,
-        categoryColor: CATEGORY_COLOR_MAP[form.category] ?? "amber",
+  const handleAddNotice = async (form) => {
+    try {
+      const created = await noticeAPI.create({
         title: form.title.trim(),
         description: form.description.trim(),
-        time: "Just now",
-      },
-      ...prev,
-    ]);
+        noticeTyped: CATEGORY_TO_BACKEND[form.category] ?? "OTHER",
+      });
+      setNotices((prev) => [normalizeNotice(created), ...prev]);
+    } catch (err) {
+      setError(typeof err.response?.data === "string" ? err.response.data : err.message);
+    }
     setShowAddModal(false);
   };
 
-  const handleDelete = (id) => {
-    setNotices((prev) => prev.filter((n) => n.id !== id));
+  const handleDelete = async (id) => {
+    try {
+      await noticeAPI.remove(id);
+      setNotices((prev) => prev.filter((n) => n.id !== id));
+    } catch (err) {
+      setError(typeof err.response?.data === "string" ? err.response.data : err.message);
+    }
   };
+
+  if (loading) return (
+    <div className="bg-white rounded-2xl border border-blue-50 shadow-sm p-6 mb-8">
+      <p className="text-sm text-slate-400 text-center py-10">Loading notices…</p>
+    </div>
+  );
 
   return (
     <>
+      {error && (
+        <div className="bg-red-50 border border-red-100 text-red-600 text-sm rounded-xl px-4 py-3 mb-4">{error}</div>
+      )}
       <div className="bg-white rounded-2xl p-6 border border-blue-50 shadow-sm mb-8">
         <div className="flex justify-between items-center mb-6">
           <div className="flex items-center gap-3">

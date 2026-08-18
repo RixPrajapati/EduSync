@@ -1,10 +1,16 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { navMenu } from "../constants/routes";
 const Navbar = () => {
   const [open, setOpen] = useState(false);
+  const navigate = useNavigate();
   const handleClick = () => {
     setOpen(!open);
+  };
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    navigate("/login");
   };
   return (
     <>
@@ -37,7 +43,7 @@ const Navbar = () => {
                 );
               })}
 
-              <button className="text-red-400 p-2 shadow-2xl bg-gray-200 rounded-2xl whitespace-nowrap ">
+              <button onClick={handleLogout} className="text-red-400 p-2 shadow-2xl bg-gray-200 rounded-2xl whitespace-nowrap ">
                 Sign out
               </button>
             </nav>

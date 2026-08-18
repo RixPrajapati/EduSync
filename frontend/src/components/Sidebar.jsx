@@ -1,7 +1,16 @@
 // src/components/Sidebar.jsx
 import React from "react";
+import { useNavigate } from "react-router-dom";
 
 function Sidebar({ isOpen, onClose }) {
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    navigate("/login");
+  };
+
   return (
     <>
       {/* Dark Background Overlay mask for mobile view backdrop */}
@@ -170,7 +179,7 @@ function Sidebar({ isOpen, onClose }) {
               <p className="text-xs text-gray-500">ID: EDU-202409</p>
             </div>
           </div>
-          <button className="w-full bg-white border py-2 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-100 transition-colors cursor-pointer active:scale-95 duration-150">
+          <button onClick={handleLogout} className="w-full bg-white border py-2 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-100 transition-colors cursor-pointer active:scale-95 duration-150">
             Logout
           </button>
         </div>

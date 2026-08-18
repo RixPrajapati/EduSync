@@ -1,3 +1,5 @@
+import { useNavigate } from "react-router-dom";
+
 const navItems = [
   {
     id: "dashboard",
@@ -41,7 +43,27 @@ const navItems = [
   },
 ];
 
+const ROLE_LABELS = { ADMIN: "Administrator", TEACHER: "Teacher", STUDENT: "Student" };
+
+function getCurrentUser() {
+  try {
+    return JSON.parse(localStorage.getItem("user"));
+  } catch {
+    return null;
+  }
+}
+
 function Sidebar({ isOpen, onClose, activeItem, onItemClick }) {
+  const navigate = useNavigate();
+  const currentUser = getCurrentUser();
+  const displayName = currentUser?.userName ?? "Admin";
+  const displayRole = ROLE_LABELS[currentUser?.role?.[0]] ?? "Administrator";
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    navigate("/login");
+  };
 
   return (
     <>
@@ -140,11 +162,11 @@ function Sidebar({ isOpen, onClose, activeItem, onItemClick }) {
                 <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-emerald-400 rounded-full border-2 border-white" />
               </div>
               <div className="flex-1 min-w-0">
-                <p className="font-semibold text-sm text-slate-800 truncate">Salina Shrestha</p>
-                <p className="text-xs text-slate-500 truncate">Administrator</p>
+                <p className="font-semibold text-sm text-slate-800 truncate">{displayName}</p>
+                <p className="text-xs text-slate-500 truncate">{displayRole}</p>
               </div>
             </div>
-            <button className="w-full flex items-center justify-center gap-2 bg-white border border-blue-100 py-1.5 rounded-lg text-sm font-medium text-slate-600 hover:bg-blue-100 hover:text-blue-700 transition-all duration-150">
+            <button onClick={handleLogout} className="w-full flex items-center justify-center gap-2 bg-white border border-blue-100 py-1.5 rounded-lg text-sm font-medium text-slate-600 hover:bg-blue-100 hover:text-blue-700 transition-all duration-150">
               <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
               </svg>

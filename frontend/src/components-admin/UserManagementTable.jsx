@@ -6,17 +6,23 @@ const inputCls = "w-full border border-blue-100 bg-blue-50/40 rounded-xl px-3 py
 
 // --- AddUserModal ---
 function AddUserModal({ role, onSave, onClose }) {
-  const [form, setForm] = useState({ name: "", email: "", password: "" });
+  const [form, setForm] = useState({
+    name: "", email: "", password: "", phone: "", city: "", gender: "MALE", dob: "",
+  });
   const profileRef = useRef(null);
   const handleChange = (e) => setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!form.name.trim() || !form.email.trim() || !form.password) return;
+    if (!form.name.trim() || !form.email.trim() || !form.password || !form.phone.trim() || !form.city.trim() || !form.dob) return;
     onSave({
       name: form.name.trim(),
       email: form.email.trim(),
       password: form.password,
+      phone: form.phone.trim(),
+      city: form.city.trim(),
+      gender: form.gender,
+      dob: form.dob,
       role,
       profile: profileRef.current?.files[0] ?? null,
     });
@@ -51,6 +57,31 @@ function AddUserModal({ role, onSave, onClose }) {
             <div>
               <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase tracking-wide">Password</label>
               <input required name="password" type="password" value={form.password} onChange={handleChange} placeholder="Set initial password" className={inputCls} />
+              <p className="text-[11px] text-slate-400 mt-1">Min 6 characters, with an uppercase letter, a number, and a special character.</p>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase tracking-wide">Phone</label>
+                <input required name="phone" value={form.phone} onChange={handleChange} placeholder="e.g. 9800000000" className={inputCls} />
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase tracking-wide">City</label>
+                <input required name="city" value={form.city} onChange={handleChange} placeholder="e.g. Kathmandu" className={inputCls} />
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase tracking-wide">Gender</label>
+                <select name="gender" value={form.gender} onChange={handleChange} className={inputCls}>
+                  <option value="MALE">Male</option>
+                  <option value="FEMALE">Female</option>
+                  <option value="OTHER">Other</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase tracking-wide">Date of Birth</label>
+                <input required name="dob" type="date" value={form.dob} onChange={handleChange} className={inputCls} />
+              </div>
             </div>
             <div>
               <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase tracking-wide">
@@ -239,33 +270,47 @@ function UserManagementTable() {
   };
 
   // Builds FormData for POST /user/addUser (multipart/form-data)
-  const handleAdd = async ({ name, email, password, role, profile }) => {
+  const handleAdd = async ({ name, email, password, phone, city, gender, dob, role, profile }) => {
     try {
       const formData = new FormData();
       formData.append("userName", name);
       formData.append("email", email);
       formData.append("password", password);
+      formData.append("phone", phone);
+      formData.append("address[city]", city);
+      formData.append("gender", gender);
+      formData.append("dob", dob);
       formData.append("role", role.toUpperCase());
       if (profile) formData.append("profile", profile);
       const created = await userAPI.create(formData);
       setUsers((prev) => [...prev, created]);
     } catch (err) {
-      setError(err.message);
+      setError(typeof err.response?.data === "string" ? err.response.data : err.response?.data?.message ?? err.message);
     }
     setAddingRole(null);
   };
 
-  // TODO: Connect to real API when backend adds PUT /user/:id endpoint
-  const handleSaveEdit = (updated) => {
-    setUsers((prev) => prev.map((u) => (u.id === editingUser.id ? { ...u, ...updated } : u)));
-    console.log("Mock success: User updated");
+  const handleSaveEdit = async (updated) => {
+    try {
+      const saved = await userAPI.update(editingUser.id, {
+        userName: updated.name,
+        email: updated.email,
+        isActive: updated.status === "Active",
+      });
+      setUsers((prev) => prev.map((u) => (u.id === editingUser.id ? saved : u)));
+    } catch (err) {
+      setError(typeof err.response?.data === "string" ? err.response.data : err.response?.data?.message ?? err.message);
+    }
     setEditingUser(null);
   };
 
-  // TODO: Connect to real API when backend adds DELETE /user/:id endpoint
-  const handleConfirmDelete = () => {
-    setUsers((prev) => prev.filter((u) => u.id !== deletingUser.id));
-    console.log("Mock success: User deleted");
+  const handleConfirmDelete = async () => {
+    try {
+      await userAPI.remove(deletingUser.id);
+      setUsers((prev) => prev.filter((u) => u.id !== deletingUser.id));
+    } catch (err) {
+      setError(typeof err.response?.data === "string" ? err.response.data : err.response?.data?.message ?? err.message);
+    }
     setDeletingUser(null);
   };
 
