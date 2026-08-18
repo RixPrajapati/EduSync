@@ -1,4 +1,5 @@
 import courseService from "../service/course.service.js";
+import { TEACHER } from "../constants/role.js";
 
 const getAllCourses = async (req, res) => {
   try {
@@ -20,8 +21,11 @@ const getCourseById = async (req, res) => {
 
 const createCourse = async (req, res) => {
   try {
-    {
+    // Teachers can only create courses for themselves; admins must pick a teacher explicitly.
+    if (req.token.role.includes(TEACHER)) {
       req.body.teacherId = req.token.id;
+    } else if (!req.body.teacherId) {
+      return res.status(400).json({ error: "teacherId is required" });
     }
     const course = await courseService.createCourse(req.body);
     res.status(201).json(course);

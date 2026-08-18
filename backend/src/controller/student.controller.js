@@ -1,4 +1,4 @@
-import studentService from "../services/student.service.js";
+import studentService from "../service/student.service.js";
 
 const createStudent = async (req, res, next) => {
   try {

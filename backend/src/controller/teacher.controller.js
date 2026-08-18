@@ -1,4 +1,4 @@
-import teacherService from "../services/teacher.service.js";
+import teacherService from "../service/teacher.service.js";
 
 const createTeacher = async (req, res, next) => {
   try {

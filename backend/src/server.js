@@ -42,6 +42,7 @@ app.use("/api/marks", marksRouter);
 app.use("/api/teachers", teacherRoutes);
 app.use("/api/students", studentRoute);
 app.use("/api/timetables", timetableRoute);
+app.use("/api/notice", noticeRouter);
 
 // Swagger documentation
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpecs));

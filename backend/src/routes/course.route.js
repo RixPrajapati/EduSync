@@ -20,7 +20,7 @@ router.get(
 router.post(
   "/",
   verifyToken,
-  allowRoles(TEACHER),
+  allowRoles(TEACHER, ADMIN),
   courseController.createCourse,
 );
 

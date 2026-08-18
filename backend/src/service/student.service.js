@@ -1,6 +1,6 @@
 import Student from "../models/Student.model.js";
-import User from "../models/User.model.js";
-import uploadFile from "../utils/fileUploader.js";
+import User from "../models/User.js";
+import uploadFile from "../utils/fileUploder.js";
 
 const createStudent = async (data, file) => {
   const { user, course, semester, className, address } = data;
@@ -22,7 +22,7 @@ const createStudent = async (data, file) => {
   }
 
   // ✅ Check if user has STUDENT role
-  if (!existingUser.roles.includes("STUDENT")) {
+  if (!existingUser.role.includes("STUDENT")) {
     const error = new Error("Selected user is not a student.");
     error.statusCode = 400;
     throw error;
@@ -112,7 +112,7 @@ const updateStudent = async (id, data, file) => {
     }
     
     // ✅ Check STUDENT role
-    if (!user.roles.includes("STUDENT")) {
+    if (!user.role.includes("STUDENT")) {
       const error = new Error("Selected user is not a student.");
       error.statusCode = 400;
       throw error;

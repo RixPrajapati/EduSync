@@ -27,7 +27,7 @@ const login = async (data) => {
     email: newUser.email,
     isActive: newUser.isActive,
     role: newUser.role,
-    userName: newUser.name,
+    userName: newUser.userName,
     phone: newUser.phone,
   };
 };

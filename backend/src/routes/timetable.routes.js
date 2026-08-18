@@ -1,13 +1,29 @@
 import express from "express";
 
-import timetableController from "../controllers/timetable.controller.js";
+import timetableController from "../controller/timetable.controller.js";
 
-import verifyToken from "../middlewares/verifyToken.js";
-import roleBasedAuth from "../middlewares/roleBasedAuth.js";
+import { verifyToken } from "../middleware/auth.js";
+import { allowRoles } from "../middleware/course.js";
 
-import { ROLE_ADMIN, ROLE_STUDENT, ROLE_TEACHER, } from "../constants/roles.js";
+import { ADMIN, STUDENT, TEACHER } from "../constants/role.js";
 
 const router = express.Router();
+
+/*
+|--------------------------------------------------------------------------
+| STUDENT
+|--------------------------------------------------------------------------
+*/
+
+router.get( "/student/my-timetable", verifyToken, allowRoles(STUDENT), timetableController.getStudentTimetable );
+
+/*
+|--------------------------------------------------------------------------
+| TEACHER
+|--------------------------------------------------------------------------
+*/
+
+router.get( "/teacher/my-timetable", verifyToken, allowRoles(TEACHER), timetableController.getTeacherTimetable );
 
 /*
 |--------------------------------------------------------------------------
@@ -16,34 +32,18 @@ const router = express.Router();
 */
 
 // Create Timetable
-router.post( "/", verifyToken, roleBasedAuth(ROLE_ADMIN), timetableController.createTimetable );
+router.post( "/", verifyToken, allowRoles(ADMIN), timetableController.createTimetable );
 
 // Get All Timetables
-router.get( "/", verifyToken, roleBasedAuth(ROLE_ADMIN), timetableController.getAllTimetables );
+router.get( "/", verifyToken, allowRoles(ADMIN), timetableController.getAllTimetables );
 
 // Get Single Timetable
-router.get( "/:id", verifyToken, roleBasedAuth(ROLE_ADMIN), timetableController.getTimetableById );
+router.get( "/:id", verifyToken, allowRoles(ADMIN), timetableController.getTimetableById );
 
 // Update Timetable
-router.put( "/:id", verifyToken, roleBasedAuth(ROLE_ADMIN), timetableController.updateTimetable );
+router.put( "/:id", verifyToken, allowRoles(ADMIN), timetableController.updateTimetable );
 
 // Delete Timetable
-router.delete( "/:id", verifyToken, roleBasedAuth(ROLE_ADMIN), timetableController.deleteTimetable );
-
-/*
-|--------------------------------------------------------------------------
-| STUDENT
-|--------------------------------------------------------------------------
-*/
-
-router.get( "/student/my-timetable", verifyToken, roleBasedAuth(ROLE_STUDENT), timetableController.getStudentTimetable );
-
-/*
-|--------------------------------------------------------------------------
-| TEACHER
-|--------------------------------------------------------------------------
-*/
-
-router.get( "/teacher/my-timetable", verifyToken, roleBasedAuth(ROLE_TEACHER), timetableController.getTeacherTimetable );
+router.delete( "/:id", verifyToken, allowRoles(ADMIN), timetableController.deleteTimetable );
 
 export default router;

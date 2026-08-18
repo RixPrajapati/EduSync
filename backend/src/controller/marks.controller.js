@@ -67,6 +67,17 @@ const getStudentSummary = async (req, res, next) => {
   }
 };
 
+const getMarksOverview = async (req, res, next) => {
+  try {
+    const overview = await marksService.getMarksOverview();
+    return res
+      .status(200)
+      .json(new ApiResponse(200, overview, "Marks overview fetched successfully"));
+  } catch (error) {
+    next(error);
+  }
+};
+
 export default {
   createMarks,
   updateMarks,
@@ -74,4 +85,5 @@ export default {
   publishResults,
   getStudentResults,
   getStudentSummary,
+  getMarksOverview,
 };
