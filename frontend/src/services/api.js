@@ -97,13 +97,22 @@ export const attendanceAPI = {
 };
 
 export const assignmentAPI = {
-  getAll: () =>
-    apiClient.get("/assignments").then((res) =>
-      Array.isArray(res.data) ? res.data : (res.data?.data ?? [])
-    ),
-  create: (data) =>
-    apiClient.post("/assignments", data).then((res) => res.data?.data ?? res.data),
-  update: (id, data) =>
-    apiClient.put(`/assignments/${id}`, data).then((res) => res.data?.data ?? res.data),
+  // GET /assignments/course/:courseId
+  getByCourse: (courseId) =>
+    apiClient.get(`/assignments/course/${courseId}`).then((res) => res.data?.data ?? []),
+
+  // POST /assignments/create — FormData (title, description, dueDate, courseId, teacherId?, file?)
+  create: (formData) =>
+    apiClient.post("/assignments/create", formData).then((res) => res.data?.data ?? res.data),
+
+  // DELETE /assignments/:id
   remove: (id) => apiClient.delete(`/assignments/${id}`),
+
+  // GET /assignments/:id/submissions
+  getSubmissions: (assignmentId) =>
+    apiClient.get(`/assignments/${assignmentId}/submissions`).then((res) => res.data?.data ?? []),
+
+  // PUT /assignments/submissions/:submissionId/grade
+  gradeSubmission: (submissionId, remarks) =>
+    apiClient.put(`/assignments/submissions/${submissionId}/grade`, { remarks }).then((res) => res.data?.data ?? res.data),
 };
