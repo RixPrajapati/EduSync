@@ -116,3 +116,17 @@ export const assignmentAPI = {
   gradeSubmission: (submissionId, remarks) =>
     apiClient.put(`/assignments/submissions/${submissionId}/grade`, { remarks }).then((res) => res.data?.data ?? res.data),
 };
+
+export const feeAPI = {
+  // GET /fees
+  getAll: () => apiClient.get("/fees").then((res) => res.data?.data ?? []),
+
+  // POST /fees — { userId, type, amount, status, paidAt }
+  create: (data) => apiClient.post("/fees", data).then((res) => res.data?.data ?? res.data),
+
+  // PUT /fees/:id
+  update: (id, data) => apiClient.put(`/fees/${id}`, data).then((res) => res.data?.data ?? res.data),
+
+  // DELETE /fees/:id
+  remove: (id) => apiClient.delete(`/fees/${id}`),
+};
