@@ -1,5 +1,6 @@
 import authService from "../service/auth.service.js";
 import jwt from "../utils/jwt.js";
+import { STUDENT } from "../constants/role.js";
 
 const login = async (req, res) => {
   try {
@@ -16,9 +17,12 @@ const login = async (req, res) => {
 
 
 const register = async (req, res) => {
-  
+
   try {
-   
+
+    // Public self-registration can only ever create a STUDENT account.
+    // TEACHER/ADMIN accounts must be created by an admin via POST /api/user/addUser.
+    req.body.role = [STUDENT];
     const user = await authService.register(req.body, req.files);
     const token = jwt.generateJwt(user);
 

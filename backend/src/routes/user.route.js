@@ -10,7 +10,7 @@ import { ADMIN } from "../constants/role.js";
 const router=Express.Router();
 
 router.get("/user",userController.getUsers)
-router.post("/addUser",normalizeRole,validation(userSchema),userController.createUser)
+router.post("/addUser",verifyToken,allowRoles(ADMIN),normalizeRole,validation(userSchema),userController.createUser)
 router.put("/:id", verifyToken, allowRoles(ADMIN), userController.updateUser)
 router.delete("/:id", verifyToken, allowRoles(ADMIN), userController.deleteUser)
 
