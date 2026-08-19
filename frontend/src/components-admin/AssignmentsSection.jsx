@@ -1,38 +1,19 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { assignmentAPI, courseAPI, userAPI } from "../services/api";
 
-const assignmentsData = [
-  { id: 1, title: "Web App Portfolio",       subject: "Web Development",      course: "BCA", due: "2025-07-10", submitted: 28, total: 32, status: "active" },
-  { id: 2, title: "Linked List Implementation", subject: "Data Structures",   course: "BCA", due: "2025-07-05", submitted: 30, total: 32, status: "active" },
-  { id: 3, title: "Firewall Configuration",  subject: "Network Security",     course: "BIT", due: "2025-06-28", submitted: 22, total: 26, status: "active" },
-  { id: 4, title: "Cloud Deployment Lab",    subject: "Cloud Computing",      course: "BIT", due: "2025-06-20", submitted: 26, total: 26, status: "closed" },
-  { id: 5, title: "SEO Campaign Report",     subject: "Digital Marketing",    course: "BBA", due: "2025-07-15", submitted: 14, total: 30, status: "active" },
-  { id: 6, title: "Balance Sheet Analysis",  subject: "Financial Accounting", course: "BBA", due: "2025-06-30", submitted: 29, total: 30, status: "active" },
-  { id: 7, title: "Business Case Study",     subject: "Strategic Management", course: "MBA", due: "2025-07-20", submitted: 10, total: 18, status: "active" },
-  { id: 8, title: "Quantum Problem Set",     subject: "Quantum Mechanics",    course: "BSc", due: "2025-06-25", submitted: 18, total: 22, status: "closed" },
-  { id: 9, title: "Thermodynamics Lab",      subject: "Thermodynamics",       course: "BSc", due: "2025-07-08", submitted: 20, total: 22, status: "active" },
-];
+const getCurrentRole = () => {
+  try {
+    return JSON.parse(localStorage.getItem("user"))?.role?.[0] ?? null;
+  } catch {
+    return null;
+  }
+};
 
-const submissionByStudent = [
-  { id: 1, name: "Ananya Singh",     course: "BCA", assignment: "Web App Portfolio",       submitted: true,  score: 88 },
-  { id: 2, name: "Bikash Shrestha", course: "BCA", assignment: "Web App Portfolio",       submitted: true,  score: 75 },
-  { id: 3, name: "Nisha Poudel",    course: "BCA", assignment: "Web App Portfolio",       submitted: true,  score: 92 },
-  { id: 4, name: "Aarav Joshi",     course: "BCA", assignment: "Web App Portfolio",       submitted: false, score: null },
-  { id: 5, name: "Arjun Khanal",    course: "BIT", assignment: "Firewall Configuration",  submitted: true,  score: 70 },
-  { id: 6, name: "Ramesh Thapa",    course: "BIT", assignment: "Firewall Configuration",  submitted: true,  score: 85 },
-  { id: 7, name: "Deepa Karki",     course: "BIT", assignment: "Firewall Configuration",  submitted: false, score: null },
-  { id: 8, name: "Priya Tamang",    course: "BBA", assignment: "SEO Campaign Report",     submitted: true,  score: 78 },
-  { id: 9, name: "Sunita Rai",      course: "BBA", assignment: "SEO Campaign Report",     submitted: false, score: null },
-  { id: 10, name: "Sita Maharjan",  course: "MBA", assignment: "Business Case Study",     submitted: true,  score: 82 },
-  { id: 11, name: "Puja KC",        course: "MBA", assignment: "Business Case Study",     submitted: true,  score: 90 },
-  { id: 12, name: "Rajan Gurung",   course: "BSc", assignment: "Thermodynamics Lab",      submitted: true,  score: 65 },
-  { id: 13, name: "Kumar Limbu",    course: "BSc", assignment: "Thermodynamics Lab",      submitted: true,  score: 74 },
-];
-
-const totalAssignments = assignmentsData.length;
-const activeAssignments = assignmentsData.filter((a) => a.status === "active").length;
-const totalSubmissions = assignmentsData.reduce((s, a) => s + a.submitted, 0);
-const totalExpected = assignmentsData.reduce((s, a) => s + a.total, 0);
-const overallRate = Math.round((totalSubmissions / totalExpected) * 100);
+const STATUS_STYLE = {
+  SUBMITTED: "bg-blue-100 text-blue-700",
+  GRADED: "bg-emerald-100 text-emerald-700",
+  LATE: "bg-red-100 text-red-600",
+};
 
 function StatBox({ label, value, sub, bg, text, icon }) {
   return (
@@ -49,46 +30,211 @@ function StatBox({ label, value, sub, bg, text, icon }) {
   );
 }
 
+function AddAssignmentModal({ teachers, onClose, onSave }) {
+  const [form, setForm] = useState({ title: "", description: "", dueDate: "", teacherId: "" });
+  const fileRef = useState(null)[0];
+  const handleChange = (e) => setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    onSave(form, document.getElementById("assignment-file-input")?.files?.[0] ?? null);
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
+      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
+        <div className="bg-gradient-to-r from-amber-500 to-orange-500 px-6 py-5">
+          <h2 className="text-lg font-bold text-white">Add Assignment</h2>
+          <p className="text-sm text-white/70 mt-0.5">Create a new assignment for this course</p>
+        </div>
+        <form onSubmit={handleSubmit}>
+          <div className="p-6 space-y-4">
+            <div>
+              <label className="block text-xs font-semibold text-slate-600 mb-1.5">Title</label>
+              <input required autoFocus name="title" value={form.title} onChange={handleChange}
+                placeholder="e.g. Chapter 5 Assignment"
+                className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-amber-200 focus:border-amber-400 transition-all" />
+            </div>
+            <div>
+              <label className="block text-xs font-semibold text-slate-600 mb-1.5">Description</label>
+              <textarea name="description" value={form.description} onChange={handleChange} rows={3}
+                placeholder="Optional description"
+                className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-amber-200 focus:border-amber-400 transition-all resize-none" />
+            </div>
+            <div>
+              <label className="block text-xs font-semibold text-slate-600 mb-1.5">Due Date</label>
+              <input required type="datetime-local" name="dueDate" value={form.dueDate} onChange={handleChange}
+                className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-amber-200 focus:border-amber-400 transition-all" />
+            </div>
+            {teachers && (
+              <div>
+                <label className="block text-xs font-semibold text-slate-600 mb-1.5">Assign Teacher</label>
+                <select required name="teacherId" value={form.teacherId} onChange={handleChange}
+                  className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-amber-200 focus:border-amber-400 transition-all">
+                  <option value="" disabled>Select a teacher</option>
+                  {teachers.map((t) => <option key={t.id} value={t.id}>{t.name}</option>)}
+                </select>
+              </div>
+            )}
+            <div>
+              <label className="block text-xs font-semibold text-slate-600 mb-1.5">
+                Attachment <span className="font-normal text-slate-400">(optional)</span>
+              </label>
+              <input id="assignment-file-input" type="file" accept="image/*,.pdf"
+                className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm text-slate-700" />
+            </div>
+          </div>
+          <div className="flex gap-3 px-6 pb-6">
+            <button type="button" onClick={onClose} className="flex-1 py-2.5 rounded-xl border border-slate-200 text-sm font-semibold text-slate-600 hover:bg-slate-50 transition-colors">
+              Cancel
+            </button>
+            <button type="submit" className="flex-1 py-2.5 rounded-xl bg-amber-500 text-white text-sm font-semibold hover:bg-amber-600 transition-colors shadow-sm">
+              Add Assignment
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
+
+function GradeModal({ submission, onClose, onSave }) {
+  const [remarks, setRemarks] = useState(submission.remarks ?? "");
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
+      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
+        <div className="bg-gradient-to-r from-emerald-600 to-teal-500 px-6 py-5">
+          <h2 className="text-lg font-bold text-white">Grade Submission</h2>
+          <p className="text-sm text-white/70 mt-0.5">{submission.studentId?.userName}</p>
+        </div>
+        <div className="p-6 space-y-4">
+          <a href={submission.submittedFile} target="_blank" rel="noreferrer" className="text-sm text-blue-600 underline break-all">
+            View submitted file
+          </a>
+          <div>
+            <label className="block text-xs font-semibold text-slate-600 mb-1.5">Remarks</label>
+            <textarea value={remarks} onChange={(e) => setRemarks(e.target.value)} rows={3}
+              placeholder="Good work! Needs improvement in..."
+              className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-emerald-200 focus:border-emerald-400 transition-all resize-none" />
+          </div>
+        </div>
+        <div className="flex gap-3 px-6 pb-6">
+          <button onClick={onClose} className="flex-1 py-2.5 rounded-xl border border-slate-200 text-sm font-semibold text-slate-600 hover:bg-slate-50 transition-colors">
+            Cancel
+          </button>
+          <button onClick={() => onSave(remarks)} className="flex-1 py-2.5 rounded-xl bg-emerald-600 text-white text-sm font-semibold hover:bg-emerald-700 transition-colors shadow-sm">
+            Save Grade
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function AssignmentsSection() {
   const [tab, setTab] = useState("overview");
-  const [courseFilter, setCourseFilter] = useState("all");
-  const [statusFilter, setStatusFilter] = useState("all");
-  const [studentCourse, setStudentCourse] = useState("BCA");
-  const [showModal, setShowModal] = useState(false);
-  const [form, setForm] = useState({ title: "", subject: "", course: "BCA", due: "", total: "" });
+  const isAdmin = getCurrentRole() === "ADMIN";
 
-  const courses = [...new Set(assignmentsData.map((a) => a.course))];
+  const [courses, setCourses] = useState([]);
+  const [selectedCourseId, setSelectedCourseId] = useState("");
+  const [assignments, setAssignments] = useState([]);
+  const [assignmentsLoading, setAssignmentsLoading] = useState(false);
+  const [error, setError] = useState(null);
 
-  const filtered = assignmentsData.filter((a) => {
-    const matchCourse = courseFilter === "all" || a.course === courseFilter;
-    const matchStatus = statusFilter === "all" || a.status === statusFilter;
-    return matchCourse && matchStatus;
-  });
+  const [teachers, setTeachers] = useState(null);
+  const [showAddModal, setShowAddModal] = useState(false);
 
-  const studentFiltered = submissionByStudent.filter((s) => s.course === studentCourse);
+  const [selectedAssignmentId, setSelectedAssignmentId] = useState("");
+  const [submissions, setSubmissions] = useState([]);
+  const [submissionsLoading, setSubmissionsLoading] = useState(false);
+  const [gradingSubmission, setGradingSubmission] = useState(null);
 
-  const downloadFile = (content, filename, type) => {
-    const blob = new Blob([content], { type });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url; a.download = filename; a.click();
-    URL.revokeObjectURL(url);
+  useEffect(() => {
+    courseAPI.getAll()
+      .then((data) => {
+        const list = Array.isArray(data) ? data : (data?.data ?? []);
+        setCourses(list);
+        if (list.length > 0) setSelectedCourseId(list[0]._id);
+      })
+      .catch(() => setCourses([]));
+  }, []);
+
+  useEffect(() => {
+    if (!isAdmin) return;
+    userAPI.getAll()
+      .then((users) => setTeachers(users.filter((u) => u.role === "TEACHER")))
+      .catch(() => setTeachers([]));
+  }, [isAdmin]);
+
+  const fetchAssignments = () => {
+    if (!selectedCourseId) return;
+    setAssignmentsLoading(true);
+    assignmentAPI.getByCourse(selectedCourseId)
+      .then((data) => setAssignments(data))
+      .catch((err) => setError(extractError(err)))
+      .finally(() => setAssignmentsLoading(false));
   };
 
-  const handleExport = () => {
-    const headers = ["Title", "Subject", "Course", "Due Date", "Submitted", "Total", "Rate", "Status"];
-    const rows = filtered.map((a) => [
-      a.title, a.subject, a.course, a.due, a.submitted, a.total,
-      `${Math.round((a.submitted / a.total) * 100)}%`, a.status,
-    ]);
-    const csv = [headers, ...rows].map((r) => r.join(",")).join("\n");
-    downloadFile(csv, "assignments-report.csv", "text/csv");
+  useEffect(fetchAssignments, [selectedCourseId]);
+
+  useEffect(() => {
+    if (assignments.length > 0) setSelectedAssignmentId(assignments[0]._id);
+    else setSelectedAssignmentId("");
+  }, [assignments]);
+
+  const fetchSubmissions = () => {
+    if (!selectedAssignmentId) { setSubmissions([]); return; }
+    setSubmissionsLoading(true);
+    assignmentAPI.getSubmissions(selectedAssignmentId)
+      .then((data) => setSubmissions(data))
+      .catch((err) => setError(extractError(err)))
+      .finally(() => setSubmissionsLoading(false));
   };
 
-  const handleAdd = () => {
-    setForm({ title: "", subject: "", course: "BCA", due: "", total: "" });
-    setShowModal(true);
+  useEffect(fetchSubmissions, [selectedAssignmentId]);
+
+  const extractError = (err) =>
+    typeof err.response?.data === "string" ? err.response.data : err.response?.data?.message ?? err.message;
+
+  const handleAddAssignment = async (form, file) => {
+    try {
+      const formData = new FormData();
+      formData.append("courseId", selectedCourseId);
+      formData.append("title", form.title);
+      formData.append("description", form.description);
+      formData.append("dueDate", new Date(form.dueDate).toISOString());
+      if (isAdmin) formData.append("teacherId", form.teacherId);
+      if (file) formData.append("file", file);
+      await assignmentAPI.create(formData);
+      setShowAddModal(false);
+      fetchAssignments();
+    } catch (err) {
+      setError(extractError(err));
+      setShowAddModal(false);
+    }
   };
+
+  const handleDeleteAssignment = async (id) => {
+    try {
+      await assignmentAPI.remove(id);
+      fetchAssignments();
+    } catch (err) {
+      setError(extractError(err));
+    }
+  };
+
+  const handleSaveGrade = async (remarks) => {
+    try {
+      await assignmentAPI.gradeSubmission(gradingSubmission._id, remarks);
+      setGradingSubmission(null);
+      fetchSubmissions();
+    } catch (err) {
+      setError(extractError(err));
+    }
+  };
+
+  const selectedCourse = courses.find((c) => c._id === selectedCourseId);
+  const selectedAssignment = assignments.find((a) => a._id === selectedAssignmentId);
+  const gradedCount = submissions.filter((s) => s.status === "GRADED").length;
 
   return (
     <div className="space-y-5">
@@ -106,12 +252,13 @@ function AssignmentsSection() {
               </div>
               <div>
                 <h1 className="text-lg font-bold text-white">Assignments</h1>
-                <p className="text-sm text-white/70 mt-0.5">Track and manage all course assignments</p>
+                <p className="text-sm text-white/70 mt-0.5">Track and manage course assignments</p>
               </div>
             </div>
             <button
-              onClick={handleAdd}
-              className="flex items-center gap-2 bg-white/20 hover:bg-white/30 text-white text-sm font-semibold px-4 py-2 rounded-xl transition-all border border-white/30"
+              onClick={() => setShowAddModal(true)}
+              disabled={!selectedCourseId}
+              className="flex items-center gap-2 bg-white/20 hover:bg-white/30 disabled:opacity-50 text-white text-sm font-semibold px-4 py-2 rounded-xl transition-all border border-white/30"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
@@ -121,30 +268,25 @@ function AssignmentsSection() {
           </div>
         </div>
 
-        {/* Stats */}
-        <div className="p-5 grid grid-cols-2 lg:grid-cols-4 gap-4">
-          <StatBox
-            label="Total Assignments" value={totalAssignments} sub="All courses"
-            bg="bg-amber-50" text="text-amber-700"
-            icon={<svg className="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2"/></svg>}
-          />
-          <StatBox
-            label="Active" value={activeAssignments} sub="Currently open"
-            bg="bg-emerald-50" text="text-emerald-700"
-            icon={<svg className="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>}
-          />
-          <StatBox
-            label="Submissions" value={totalSubmissions} sub={`of ${totalExpected} expected`}
-            bg="bg-blue-50" text="text-blue-700"
-            icon={<svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>}
-          />
-          <StatBox
-            label="Submission Rate" value={`${overallRate}%`} sub="College-wide"
-            bg="bg-purple-50" text="text-purple-700"
-            icon={<svg className="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>}
-          />
+        <div className="p-5">
+          <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase tracking-wide">Course</label>
+          <select
+            value={selectedCourseId}
+            onChange={(e) => setSelectedCourseId(e.target.value)}
+            className="w-full sm:w-80 text-sm px-3 py-2.5 rounded-xl border border-slate-200 bg-slate-50/60 text-slate-700 focus:outline-none focus:ring-2 focus:ring-amber-200 focus:border-amber-400 transition-all"
+          >
+            {courses.length === 0 && <option>No courses yet</option>}
+            {courses.map((c) => <option key={c._id} value={c._id}>{c.courseName} ({c.courseCode})</option>)}
+          </select>
         </div>
       </div>
+
+      {error && (
+        <div className="bg-red-50 border border-red-100 text-red-600 text-sm rounded-xl px-4 py-3 flex items-start justify-between gap-3">
+          <span>{error}</span>
+          <button onClick={() => setError(null)} className="text-red-400 hover:text-red-600 shrink-0">✕</button>
+        </div>
+      )}
 
       {/* Tabs */}
       <div className="flex gap-2">
@@ -158,95 +300,55 @@ function AssignmentsSection() {
                 : "bg-white border border-slate-200 text-slate-600 hover:bg-slate-50"
             }`}
           >
-            {t === "overview" ? "Overview" : "By Course"}
+            {t === "overview" ? "Overview" : "Submissions"}
           </button>
         ))}
       </div>
 
       {tab === "overview" && (
         <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-6 py-4 border-b border-slate-100">
-            <div>
-              <h2 className="text-sm font-bold text-slate-700">All Assignments</h2>
-              <p className="text-xs text-slate-400 mt-0.5">{filtered.length} assignments</p>
-            </div>
-            <div className="flex items-center gap-2 flex-wrap">
-              <select
-                value={courseFilter}
-                onChange={(e) => setCourseFilter(e.target.value)}
-                className="text-sm px-3 py-2 rounded-xl border border-slate-200 bg-slate-50/60 text-slate-700 focus:outline-none focus:ring-2 focus:ring-amber-200 focus:border-amber-400 transition-all"
-              >
-                <option value="all">All Courses</option>
-                {courses.map((c) => <option key={c} value={c}>{c}</option>)}
-              </select>
-              <select
-                value={statusFilter}
-                onChange={(e) => setStatusFilter(e.target.value)}
-                className="text-sm px-3 py-2 rounded-xl border border-slate-200 bg-slate-50/60 text-slate-700 focus:outline-none focus:ring-2 focus:ring-amber-200 focus:border-amber-400 transition-all"
-              >
-                <option value="all">All Status</option>
-                <option value="active">Active</option>
-                <option value="closed">Closed</option>
-              </select>
-              <button
-                onClick={handleExport}
-                className="flex items-center gap-1.5 text-emerald-700 bg-emerald-50 border border-emerald-200 hover:bg-emerald-100 text-xs font-semibold px-3 py-2 rounded-xl transition-colors"
-              >
-                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
-                </svg>
-                Export CSV
-              </button>
-            </div>
+          <div className="px-6 py-4 border-b border-slate-100">
+            <h2 className="text-sm font-bold text-slate-700">Assignments{selectedCourse ? ` · ${selectedCourse.courseName}` : ""}</h2>
+            <p className="text-xs text-slate-400 mt-0.5">{assignmentsLoading ? "Loading…" : `${assignments.length} assignment${assignments.length !== 1 ? "s" : ""}`}</p>
           </div>
 
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
                 <tr className="bg-slate-50 border-b border-slate-100">
-                  <th className="text-left py-3 px-6 text-slate-500 font-semibold text-xs uppercase tracking-wide">Assignment</th>
-                  <th className="text-left py-3 px-4 text-slate-500 font-semibold text-xs uppercase tracking-wide">Course</th>
+                  <th className="text-left py-3 px-6 text-slate-500 font-semibold text-xs uppercase tracking-wide">Title</th>
                   <th className="text-left py-3 px-4 text-slate-500 font-semibold text-xs uppercase tracking-wide">Due Date</th>
-                  <th className="text-left py-3 px-4 text-slate-500 font-semibold text-xs uppercase tracking-wide">Submissions</th>
-                  <th className="text-left py-3 px-4 text-slate-500 font-semibold text-xs uppercase tracking-wide">Status</th>
+                  <th className="text-left py-3 px-4 text-slate-500 font-semibold text-xs uppercase tracking-wide">Attachment</th>
+                  <th className="text-right py-3 px-6 text-slate-500 font-semibold text-xs uppercase tracking-wide">Actions</th>
                 </tr>
               </thead>
               <tbody>
-                {filtered.map((a) => {
-                  const rate = Math.round((a.submitted / a.total) * 100);
-                  return (
-                    <tr key={a.id} className="border-b border-slate-50 hover:bg-slate-50/60 transition-colors">
-                      <td className="py-4 px-6">
-                        <p className="text-sm font-semibold text-slate-800">{a.title}</p>
-                        <p className="text-xs text-slate-400 mt-0.5">{a.subject}</p>
-                      </td>
-                      <td className="py-4 px-4">
-                        <span className="text-xs font-bold px-2.5 py-0.5 rounded-lg bg-amber-100 text-amber-700">{a.course}</span>
-                      </td>
-                      <td className="py-4 px-4 text-sm text-slate-600">{a.due}</td>
-                      <td className="py-4 px-4">
-                        <div className="flex items-center gap-2">
-                          <div className="w-24 h-2 bg-slate-100 rounded-full overflow-hidden">
-                            <div
-                              className={`h-full rounded-full ${rate >= 90 ? "bg-emerald-500" : rate >= 60 ? "bg-amber-400" : "bg-red-400"}`}
-                              style={{ width: `${rate}%` }}
-                            />
-                          </div>
-                          <span className="text-xs font-semibold text-slate-600">{a.submitted}/{a.total}</span>
-                        </div>
-                      </td>
-                      <td className="py-4 px-4">
-                        <span className={`text-xs font-bold px-2.5 py-1 rounded-full ${
-                          a.status === "active"
-                            ? "bg-emerald-100 text-emerald-700"
-                            : "bg-slate-100 text-slate-500"
-                        }`}>
-                          {a.status === "active" ? "Active" : "Closed"}
-                        </span>
-                      </td>
-                    </tr>
-                  );
-                })}
+                {assignments.length === 0 ? (
+                  <tr><td colSpan="4" className="text-center py-8 text-slate-400">No assignments for this course yet.</td></tr>
+                ) : assignments.map((a) => (
+                  <tr key={a._id} className="border-b border-slate-50 hover:bg-slate-50/60 transition-colors">
+                    <td className="py-4 px-6">
+                      <p className="text-sm font-semibold text-slate-800">{a.title}</p>
+                      {a.description && <p className="text-xs text-slate-400 mt-0.5">{a.description}</p>}
+                    </td>
+                    <td className="py-4 px-4 text-sm text-slate-600">{new Date(a.dueDate).toLocaleString()}</td>
+                    <td className="py-4 px-4">
+                      {a.fileUrl ? (
+                        <a href={a.fileUrl} target="_blank" rel="noreferrer" className="text-xs font-semibold text-blue-600 hover:text-blue-800">View file</a>
+                      ) : (
+                        <span className="text-xs text-slate-300">—</span>
+                      )}
+                    </td>
+                    <td className="py-4 px-6 text-right">
+                      <button onClick={() => { setTab("submissions"); setSelectedAssignmentId(a._id); }} className="text-xs font-semibold text-blue-600 hover:text-blue-800 mr-3">
+                        Submissions
+                      </button>
+                      <button onClick={() => handleDeleteAssignment(a._id)} className="text-xs font-semibold text-red-500 hover:text-red-700">
+                        Delete
+                      </button>
+                    </td>
+                  </tr>
+                ))}
               </tbody>
             </table>
           </div>
@@ -257,44 +359,46 @@ function AssignmentsSection() {
         <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-6 py-4 border-b border-slate-100">
             <div>
-              <h2 className="text-sm font-bold text-slate-700">Student Submissions by Course</h2>
-              <p className="text-xs text-slate-400 mt-0.5">{studentFiltered.length} student{studentFiltered.length !== 1 ? "s" : ""}</p>
+              <h2 className="text-sm font-bold text-slate-700">Submissions</h2>
+              <p className="text-xs text-slate-400 mt-0.5">
+                {submissionsLoading ? "Loading…" : `${submissions.length} submission${submissions.length !== 1 ? "s" : ""} · ${gradedCount} graded`}
+              </p>
             </div>
             <select
-              value={studentCourse}
-              onChange={(e) => setStudentCourse(e.target.value)}
+              value={selectedAssignmentId}
+              onChange={(e) => setSelectedAssignmentId(e.target.value)}
+              disabled={assignments.length === 0}
               className="text-sm px-3 py-2 rounded-xl border border-slate-200 bg-slate-50/60 text-slate-700 focus:outline-none focus:ring-2 focus:ring-amber-200 focus:border-amber-400 transition-all"
             >
-              {courses.map((c) => <option key={c} value={c}>{c}</option>)}
+              {assignments.length === 0 && <option>No assignments</option>}
+              {assignments.map((a) => <option key={a._id} value={a._id}>{a.title}</option>)}
             </select>
           </div>
 
           <div className="p-5 space-y-2.5">
-            {studentFiltered.map((s) => (
-              <div key={s.id} className="flex items-center gap-4 px-4 py-3.5 rounded-2xl border border-slate-100 hover:border-slate-200 hover:shadow-sm bg-white transition-all">
-                <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${s.submitted ? "bg-emerald-100" : "bg-red-100"}`}>
-                  <svg className={`w-4 h-4 ${s.submitted ? "text-emerald-600" : "text-red-500"}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    {s.submitted
-                      ? <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                      : <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                    }
+            {submissions.length === 0 ? (
+              <p className="text-sm text-slate-400 text-center py-8">
+                {selectedAssignment ? "No submissions yet for this assignment." : "Pick an assignment above."}
+              </p>
+            ) : submissions.map((s) => (
+              <div key={s._id} className="flex items-center gap-4 px-4 py-3.5 rounded-2xl border border-slate-100 hover:border-slate-200 hover:shadow-sm bg-white transition-all">
+                <div className="w-9 h-9 rounded-xl bg-blue-100 flex items-center justify-center shrink-0">
+                  <svg className="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
                   </svg>
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-semibold text-slate-800">{s.name}</p>
-                  <p className="text-xs text-slate-400 mt-0.5">{s.assignment}</p>
+                  <p className="text-sm font-semibold text-slate-800">{s.studentId?.userName ?? "Unknown"}</p>
+                  <a href={s.submittedFile} target="_blank" rel="noreferrer" className="text-xs text-blue-600 hover:underline">View file</a>
+                  {s.remarks && <p className="text-xs text-slate-400 mt-0.5">{s.remarks}</p>}
                 </div>
-                <div className="text-right shrink-0">
-                  {s.submitted ? (
-                    <span className="text-sm font-bold text-slate-700">{s.score}/100</span>
-                  ) : (
-                    <span className="text-xs font-bold px-2.5 py-1 rounded-full bg-red-100 text-red-600">Not Submitted</span>
-                  )}
-                  {s.submitted && (
-                    <span className={`ml-2 text-xs font-bold px-2.5 py-1 rounded-full ${s.score >= 80 ? "bg-emerald-100 text-emerald-700" : s.score >= 60 ? "bg-amber-100 text-amber-700" : "bg-red-100 text-red-600"}`}>
-                      {s.score >= 80 ? "Excellent" : s.score >= 60 ? "Good" : "Needs Work"}
-                    </span>
-                  )}
+                <div className="flex items-center gap-2 shrink-0">
+                  <span className={`text-xs font-bold px-2.5 py-1 rounded-full ${STATUS_STYLE[s.status] ?? "bg-slate-100 text-slate-600"}`}>
+                    {s.status}
+                  </span>
+                  <button onClick={() => setGradingSubmission(s)} className="text-xs font-semibold text-emerald-600 hover:text-emerald-800">
+                    Grade
+                  </button>
                 </div>
               </div>
             ))}
@@ -302,59 +406,11 @@ function AssignmentsSection() {
         </div>
       )}
 
-      {/* Add Assignment Modal */}
-      {showModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
-            <div className="bg-gradient-to-r from-amber-500 to-orange-500 px-6 py-5">
-              <h2 className="text-lg font-bold text-white">Add Assignment</h2>
-              <p className="text-sm text-white/70 mt-0.5">Create a new assignment for a course</p>
-            </div>
-            <div className="p-6 space-y-4">
-              {[
-                { label: "Assignment Title", key: "title", placeholder: "e.g. Lab Report 3" },
-                { label: "Subject", key: "subject", placeholder: "e.g. Data Structures" },
-                { label: "Due Date", key: "due", placeholder: "", type: "date" },
-                { label: "Total Students", key: "total", placeholder: "e.g. 30", type: "number" },
-              ].map(({ label, key, placeholder, type }) => (
-                <div key={key}>
-                  <label className="block text-xs font-semibold text-slate-600 mb-1.5">{label}</label>
-                  <input
-                    type={type || "text"}
-                    placeholder={placeholder}
-                    value={form[key]}
-                    onChange={(e) => setForm((f) => ({ ...f, [key]: e.target.value }))}
-                    className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-amber-200 focus:border-amber-400 transition-all"
-                  />
-                </div>
-              ))}
-              <div>
-                <label className="block text-xs font-semibold text-slate-600 mb-1.5">Course</label>
-                <select
-                  value={form.course}
-                  onChange={(e) => setForm((f) => ({ ...f, course: e.target.value }))}
-                  className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-amber-200 focus:border-amber-400 transition-all"
-                >
-                  {courses.map((c) => <option key={c} value={c}>{c}</option>)}
-                </select>
-              </div>
-            </div>
-            <div className="flex gap-3 px-6 pb-6">
-              <button
-                onClick={() => setShowModal(false)}
-                className="flex-1 py-2.5 rounded-xl border border-slate-200 text-sm font-semibold text-slate-600 hover:bg-slate-50 transition-colors"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={() => setShowModal(false)}
-                className="flex-1 py-2.5 rounded-xl bg-amber-500 text-white text-sm font-semibold hover:bg-amber-600 transition-colors shadow-sm"
-              >
-                Add Assignment
-              </button>
-            </div>
-          </div>
-        </div>
+      {showAddModal && (
+        <AddAssignmentModal teachers={teachers} onClose={() => setShowAddModal(false)} onSave={handleAddAssignment} />
+      )}
+      {gradingSubmission && (
+        <GradeModal submission={gradingSubmission} onClose={() => setGradingSubmission(null)} onSave={handleSaveGrade} />
       )}
     </div>
   );

@@ -1,4 +1,4 @@
-import timetableService from "../services/timetable.service.js";
+import timetableService from "../service/timetable.service.js";
 import Teacher from "../models/Teacher.model.js";
 import Student from "../models/Student.model.js";
 
@@ -92,7 +92,7 @@ const getStudentTimetable = async (req, res) => {
     try {
         // Find student profile using logged-in user ID
         const student = await Student.findOne({
-            user: req.user._id,
+            user: req.token.id,
         });
 
         if (!student) {
@@ -123,10 +123,9 @@ console.log("Student Class:", student.className);
 
 const getTeacherTimetable = async (req, res) => {
     try {
-        console.log("req.user:", req.user);
         // Find teacher profile using logged-in user ID
         const teacher = await Teacher.findOne({
-            user: req.user._id,
+            user: req.token.id,
         });
 
         if (!teacher) {

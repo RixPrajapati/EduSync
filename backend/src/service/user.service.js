@@ -10,4 +10,25 @@ const getUsers = () => {
 const createUser = async (user,files) => {
    return authService.register(user,files)
 }
-export default { getUsers, createUser }
+
+const updateUser = async (id, data) => {
+    const user = await User.findByIdAndUpdate(id, data, { new: true, runValidators: true });
+    if (!user) {
+        const error = new Error("User not found");
+        error.statusCode = 404;
+        throw error;
+    }
+    return user;
+}
+
+const deleteUser = async (id) => {
+    const user = await User.findByIdAndDelete(id);
+    if (!user) {
+        const error = new Error("User not found");
+        error.statusCode = 404;
+        throw error;
+    }
+    return user;
+}
+
+export default { getUsers, createUser, updateUser, deleteUser }

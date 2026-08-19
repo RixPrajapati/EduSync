@@ -1,7 +1,7 @@
 import { v2 as cloudinary } from "cloudinary";
 
 
-async function uploadFile(files) {
+async function uploadFile(files, allowedFormats = ["jpg", "png", "webp", "jpeg"]) {
   if (!files) return [];
 
   const fileArray = Array.isArray(files) ? files : [files];
@@ -16,7 +16,7 @@ async function uploadFile(files) {
         .upload_stream(
           {
             folder: "mern-20260320",
-            allowed_formats: ["jpg", "png", "webp", "jpeg"]
+            allowed_formats: allowedFormats
           },
           (err, data) => {
             if (err) return reject(err);

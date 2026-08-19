@@ -184,6 +184,67 @@ const getStudentSummary = async (studentId) => {
   };
 };
 
+const getMarksOverview = async () => {
+  const allMarks = await Marks.find({ isPublished: true })
+    .populate("studentId", "userName")
+    .populate("courseId", "courseName");
+
+  const totalRecords = allMarks.length;
+  const averageMarks = totalRecords === 0
+    ? 0
+    : Number((allMarks.reduce((sum, m) => sum + m.totalMarks, 0) / totalRecords).toFixed(1));
+  const passCount = allMarks.filter((m) => m.grade !== "F").length;
+  const passPercentage = totalRecords === 0 ? 0 : Number(((passCount / totalRecords) * 100).toFixed(1));
+
+  const gradeDistribution = {};
+  for (const m of allMarks) {
+    gradeDistribution[m.grade] = (gradeDistribution[m.grade] ?? 0) + 1;
+  }
+
+  // Students with at least one failed (F) course
+  const backlogMap = new Map();
+  for (const m of allMarks) {
+    if (m.grade !== "F") continue;
+    const sid = m.studentId?._id?.toString();
+    if (!sid) continue;
+    if (!backlogMap.has(sid)) {
+      backlogMap.set(sid, { studentId: sid, name: m.studentId.userName, failedSubjects: 0 });
+    }
+    backlogMap.get(sid).failedSubjects += 1;
+  }
+  const backlogStudents = Array.from(backlogMap.values());
+  const totalBacklogs = backlogStudents.reduce((sum, b) => sum + b.failedSubjects, 0);
+
+  // Per-course averages and pass rates
+  const courseMap = new Map();
+  for (const m of allMarks) {
+    const cid = m.courseId?._id?.toString();
+    if (!cid) continue;
+    if (!courseMap.has(cid)) {
+      courseMap.set(cid, { subject: m.courseId.courseName, marksSum: 0, count: 0, passCount: 0 });
+    }
+    const c = courseMap.get(cid);
+    c.marksSum += m.totalMarks;
+    c.count += 1;
+    if (m.grade !== "F") c.passCount += 1;
+  }
+  const subjectWise = Array.from(courseMap.values()).map((c) => ({
+    subject: c.subject,
+    avgMarks: Number((c.marksSum / c.count).toFixed(1)),
+    passRate: Number(((c.passCount / c.count) * 100).toFixed(1)),
+  }));
+
+  return {
+    totalStudents: new Set(allMarks.map((m) => m.studentId?._id?.toString())).size,
+    averageMarks,
+    passPercentage,
+    totalBacklogs,
+    gradeDistribution,
+    backlogStudents,
+    subjectWise,
+  };
+};
+
 export default {
   createMarks,
   updateMarks,
@@ -191,4 +252,5 @@ export default {
   publishResults,
   getStudentResults,
   getStudentSummary,
+  getMarksOverview,
 };
