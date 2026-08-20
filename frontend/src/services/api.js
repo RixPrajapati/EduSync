@@ -25,6 +25,11 @@ export const authAPI = {
   // POST /auth/login — returns { ...user, token }
   login: (email, password) =>
     apiClient.post("/auth/login", { email, password }).then((res) => res.data),
+
+  // POST /auth/register — public signup. Backend decides the role:
+  // the very first account ever created becomes ADMIN, every one after is STUDENT.
+  register: (formData) =>
+    apiClient.post("/auth/register", formData).then((res) => res.data),
 };
 
 export const userAPI = {
@@ -152,11 +157,22 @@ export const assignmentAPI = {
   // PUT /assignments/submissions/:submissionId/grade
   gradeSubmission: (submissionId, remarks) =>
     apiClient.put(`/assignments/submissions/${submissionId}/grade`, { remarks }).then((res) => res.data?.data ?? res.data),
+
+  // POST /assignments/submit — FormData (assignmentId, file) — student
+  submit: (formData) =>
+    apiClient.post("/assignments/submit", formData).then((res) => res.data?.data ?? res.data),
+
+  // GET /assignments/my-submissions — student
+  getMySubmissions: () =>
+    apiClient.get("/assignments/my-submissions").then((res) => res.data?.data ?? []),
 };
 
 export const feeAPI = {
   // GET /fees
   getAll: () => apiClient.get("/fees").then((res) => res.data?.data ?? []),
+
+  // GET /fees/my (own records, any authenticated role)
+  getMyFees: () => apiClient.get("/fees/my").then((res) => res.data?.data ?? []),
 
   // POST /fees — { userId, type, amount, status, paidAt }
   create: (data) => apiClient.post("/fees", data).then((res) => res.data?.data ?? res.data),
