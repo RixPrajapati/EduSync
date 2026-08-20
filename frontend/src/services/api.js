@@ -136,6 +136,31 @@ export const timetableAPI = {
   // GET /timetables/student/my-timetable
   getMyStudentTimetable: () =>
     apiClient.get("/timetables/student/my-timetable").then((res) => res.data?.data ?? []),
+
+  // GET /timetables — ADMIN
+  getAll: () => apiClient.get("/timetables").then((res) => res.data?.data ?? []),
+
+  // POST /timetables — { className, subject, teacher, day, startTime, endTime, roomNumber } — ADMIN
+  create: (data) => apiClient.post("/timetables", data).then((res) => res.data?.data ?? res.data),
+
+  // DELETE /timetables/:id — ADMIN
+  remove: (id) => apiClient.delete(`/timetables/${id}`),
+};
+
+export const teacherAPI = {
+  // GET /teachers
+  getAll: () => apiClient.get("/teachers").then((res) => res.data?.data ?? []),
+
+  // POST /teachers — { user, department, subjects?, experience? } — ADMIN
+  create: (data) => apiClient.post("/teachers", data).then((res) => res.data?.data ?? res.data),
+};
+
+export const studentAPI = {
+  // GET /students
+  getAll: () => apiClient.get("/students").then((res) => res.data?.data ?? []),
+
+  // POST /students — { user, course, semester, className, address? } — ADMIN
+  create: (data) => apiClient.post("/students", data).then((res) => res.data?.data ?? res.data),
 };
 
 export const assignmentAPI = {
