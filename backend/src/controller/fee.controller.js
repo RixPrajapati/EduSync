@@ -19,6 +19,15 @@ const getAllFees = async (req, res, next) => {
   }
 };
 
+const getMyFees = async (req, res, next) => {
+  try {
+    const fees = await feeService.getMyFees(req.token.id);
+    return res.status(200).json(new ApiResponse(200, fees, "Fees fetched successfully"));
+  } catch (error) {
+    next(error);
+  }
+};
+
 const getFeeById = async (req, res, next) => {
   try {
     const fee = await feeService.getFeeById(req.params.id);
@@ -46,4 +55,4 @@ const deleteFee = async (req, res, next) => {
   }
 };
 
-export default { createFee, getAllFees, getFeeById, updateFee, deleteFee };
+export default { createFee, getAllFees, getMyFees, getFeeById, updateFee, deleteFee };

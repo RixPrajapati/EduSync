@@ -22,6 +22,12 @@ const getAllFees = async () => {
     .sort({ paidAt: -1 });
 };
 
+const getMyFees = async (userId) => {
+  return await Fee.find({ userId })
+    .populate("userId", "userName email")
+    .sort({ paidAt: -1 });
+};
+
 const getFeeById = async (id) => {
   const fee = await Fee.findById(id).populate("userId", "userName email");
   if (!fee) throw new ApiError(404, "Fee record not found");
@@ -41,4 +47,4 @@ const deleteFee = async (id) => {
   return { message: "Fee record deleted successfully" };
 };
 
-export default { createFee, getAllFees, getFeeById, updateFee, deleteFee };
+export default { createFee, getAllFees, getMyFees, getFeeById, updateFee, deleteFee };

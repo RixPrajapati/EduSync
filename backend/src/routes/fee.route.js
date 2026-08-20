@@ -8,6 +8,7 @@ const router = express.Router();
 
 router.post("/", verifyToken, allowRoles(ADMIN), feeController.createFee);
 router.get("/", verifyToken, allowRoles(ADMIN), feeController.getAllFees);
+router.get("/my", verifyToken, feeController.getMyFees);
 router.get("/:id", verifyToken, allowRoles(ADMIN), feeController.getFeeById);
 router.put("/:id", verifyToken, allowRoles(ADMIN), feeController.updateFee);
 router.delete("/:id", verifyToken, allowRoles(ADMIN), feeController.deleteFee);
