@@ -13,5 +13,10 @@ const config = {
     apisecret: process.env.CLOUDINARY_API_SECRET || "",
   },
   resend_email_api_key: process.env.RESEND_EMAIL_API_KEY || "",
+  // Comma-separated list of allowed frontend origins, e.g. "https://app.edusync.com,https://staging.edusync.com"
+  corsOrigins: (process.env.CORS_ORIGIN || "http://localhost:5173")
+    .split(",")
+    .map((origin) => origin.trim())
+    .filter(Boolean),
 };
 export default config;
