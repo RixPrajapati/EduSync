@@ -31,7 +31,7 @@ dataBaseConnection();
 cloudinaryConnection();
 app.use(bodyParser.json());
 app.use(cookieParser());
-app.use(cors());
+app.use(cors({ origin: config.corsOrigins, credentials: true }));
 
 const upload = multer({ storage: multer.memoryStorage() });
 
