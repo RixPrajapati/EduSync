@@ -73,6 +73,10 @@ export const courseAPI = {
   // GET /course
   getAll: () => apiClient.get("/course").then((res) => res.data),
 
+  // GET /course/teacher/:teacherId
+  getByTeacher: (teacherId) =>
+    apiClient.get(`/course/teacher/${teacherId}`).then((res) => res.data?.data ?? []),
+
   // POST /course — backend only allows TEACHER role to create
   create: (data) => apiClient.post("/course", data).then((res) => res.data),
 
@@ -91,6 +95,12 @@ export const marksAPI = {
   getByCourse: (courseId) =>
     apiClient.get(`/marks/course/${courseId}`).then((res) => res.data?.data ?? res.data),
 
+  // POST /marks — { studentId, courseId, internalMarks, practicalMarks, finalExamMarks, remarks }
+  create: (data) => apiClient.post("/marks", data).then((res) => res.data?.data ?? res.data),
+
+  // PATCH /marks/publish/:courseId
+  publish: (courseId) => apiClient.patch(`/marks/publish/${courseId}`).then((res) => res.data),
+
   // GET /marks/my-results (student)
   getMyResults: () => apiClient.get("/marks/my-results").then((res) => res.data?.data ?? []),
 
@@ -106,6 +116,9 @@ export const attendanceAPI = {
   getByCourse: (courseId) =>
     apiClient.get(`/attendance/course/${courseId}`).then((res) => res.data?.data ?? res.data),
 
+  // POST /attendance/mark — { studentId, courseId, attendanceDate, status }
+  mark: (data) => apiClient.post("/attendance/mark", data).then((res) => res.data?.data ?? res.data),
+
   // GET /attendance/percentage/:studentId (student)
   getMyPercentage: (studentId) =>
     apiClient.get(`/attendance/percentage/${studentId}`).then((res) => res.data?.data ?? res.data),
@@ -113,6 +126,16 @@ export const attendanceAPI = {
   // GET /attendance/student/:studentId (student)
   getMyRecords: (studentId) =>
     apiClient.get(`/attendance/student/${studentId}`).then((res) => res.data?.data ?? []),
+};
+
+export const timetableAPI = {
+  // GET /timetables/teacher/my-timetable
+  getMyTeacherTimetable: () =>
+    apiClient.get("/timetables/teacher/my-timetable").then((res) => res.data?.data ?? []),
+
+  // GET /timetables/student/my-timetable
+  getMyStudentTimetable: () =>
+    apiClient.get("/timetables/student/my-timetable").then((res) => res.data?.data ?? []),
 };
 
 export const assignmentAPI = {
