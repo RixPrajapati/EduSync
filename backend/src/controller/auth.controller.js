@@ -2,6 +2,7 @@ import authService from "../service/auth.service.js";
 import jwt from "../utils/jwt.js";
 import { STUDENT, ADMIN } from "../constants/role.js";
 import User from "../models/User.js";
+import BootstrapLock from "../models/BootstrapLock.js";
 
 const login = async (req, res) => {
   try {
@@ -25,9 +26,31 @@ const register = async (req, res) => {
     // EXCEPT for the very first account on a fresh deployment — that one
     // becomes ADMIN so there's always a way to bootstrap a new install.
     // Once any user exists, this door closes for good.
+    //
+    // The ADMIN grant itself is decided by an atomic claim (BootstrapLock's
+    // unique _id) rather than just this count check, so two registrations
+    // arriving at the same instant on an empty database can't both win ADMIN.
+    let isFirstAdmin = false;
     const userCount = await User.countDocuments();
-    req.body.role = userCount === 0 ? [ADMIN] : [STUDENT];
-    const user = await authService.register(req.body, req.files);
+    if (userCount === 0) {
+      try {
+        await BootstrapLock.create({ _id: "admin-bootstrap" });
+        isFirstAdmin = true;
+      } catch (lockErr) {
+        if (lockErr.code !== 11000) throw lockErr;
+      }
+    }
+    req.body.role = isFirstAdmin ? [ADMIN] : [STUDENT];
+
+    let user;
+    try {
+      user = await authService.register(req.body, req.files);
+    } catch (registerErr) {
+      // Registration itself failed (e.g. duplicate email) — release the
+      // bootstrap slot so it isn't burned on a user that was never created.
+      if (isFirstAdmin) await BootstrapLock.deleteOne({ _id: "admin-bootstrap" });
+      throw registerErr;
+    }
     const token = jwt.generateJwt(user);
 
     
