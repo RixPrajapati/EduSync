@@ -25,6 +25,11 @@ export const authAPI = {
   // POST /auth/login — returns { ...user, token }
   login: (email, password) =>
     apiClient.post("/auth/login", { email, password }).then((res) => res.data),
+
+  // POST /auth/register — public signup. Backend decides the role:
+  // the very first account ever created becomes ADMIN, every one after is STUDENT.
+  register: (formData) =>
+    apiClient.post("/auth/register", formData).then((res) => res.data),
 };
 
 export const userAPI = {

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { authAPI } from './services/api';
 import {
   Mail, 
@@ -332,6 +332,13 @@ export default function Login() {
               <ArrowRight className="h-4 w-4 transform transition-transform duration-200 group-hover:translate-x-1" />
             </button>
           </form>
+
+          <p className="text-center text-sm text-slate-500">
+            Don't have an account?{" "}
+            <Link to="/register" className="font-semibold text-[#2563EB] hover:text-[#0F4CDB] transition-colors duration-200">
+              Sign Up
+            </Link>
+          </p>
 
         </div>
       </div>

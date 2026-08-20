@@ -1,6 +1,7 @@
 import authService from "../service/auth.service.js";
 import jwt from "../utils/jwt.js";
-import { STUDENT } from "../constants/role.js";
+import { STUDENT, ADMIN } from "../constants/role.js";
+import User from "../models/User.js";
 
 const login = async (req, res) => {
   try {
@@ -20,9 +21,12 @@ const register = async (req, res) => {
 
   try {
 
-    // Public self-registration can only ever create a STUDENT account.
-    // TEACHER/ADMIN accounts must be created by an admin via POST /api/user/addUser.
-    req.body.role = [STUDENT];
+    // Public self-registration can only ever create a STUDENT account,
+    // EXCEPT for the very first account on a fresh deployment — that one
+    // becomes ADMIN so there's always a way to bootstrap a new install.
+    // Once any user exists, this door closes for good.
+    const userCount = await User.countDocuments();
+    req.body.role = userCount === 0 ? [ADMIN] : [STUDENT];
     const user = await authService.register(req.body, req.files);
     const token = jwt.generateJwt(user);
 
