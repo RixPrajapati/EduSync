@@ -10,6 +10,7 @@ import AcademicManagement from "./AcademicManagement";
 import AttendanceSection from "./AttendanceSection";
 import MarksSection from "./MarksSection";
 import AssignmentsSection from "./AssignmentsSection";
+import TimetableSection from "./TimetableSection";
 
 const sectionTitles = {
   dashboard: "Dashboard",
@@ -20,6 +21,7 @@ const sectionTitles = {
   marks: "Marks",
   assignments: "Assignments",
   courses: "Courses",
+  timetable: "Timetable",
 };
 
 
@@ -99,6 +101,7 @@ function AdminDashboard() {
           {activeSection === "attendance"  && <AttendanceSection />}
           {activeSection === "marks"       && <MarksSection />}
           {activeSection === "assignments" && <AssignmentsSection />}
+          {activeSection === "timetable"   && <TimetableSection />}
         </main>
       </div>
     </div>

@@ -2,14 +2,23 @@ import authService from "../service/auth.service.js";
 import jwt from "../utils/jwt.js";
 import { STUDENT, ADMIN } from "../constants/role.js";
 import User from "../models/User.js";
+import BootstrapLock from "../models/BootstrapLock.js";
+
+// httpOnly so an XSS payload can't read the token via document.cookie; secure
+// in production since that's HTTPS-only; sameSite lax is enough since the
+// frontend/backend are same-site (differ only by port) in this deployment.
+const authCookieOptions = {
+  maxAge: 86400 * 1000,
+  httpOnly: true,
+  secure: process.env.NODE_ENV === "production",
+  sameSite: "lax",
+};
 
 const login = async (req, res) => {
   try {
     const user = await authService.login(req.body);
     const token = jwt.generateJwt(user);
-    res.cookie("token", token, {
-      maxAge: 86400 * 1000,
-    });
+    res.cookie("token", token, authCookieOptions);
     res.status(200).json({ ...user, token });
   } catch (err) {
     res.status(400).send(err.message);
@@ -25,15 +34,35 @@ const register = async (req, res) => {
     // EXCEPT for the very first account on a fresh deployment — that one
     // becomes ADMIN so there's always a way to bootstrap a new install.
     // Once any user exists, this door closes for good.
+    //
+    // The ADMIN grant itself is decided by an atomic claim (BootstrapLock's
+    // unique _id) rather than just this count check, so two registrations
+    // arriving at the same instant on an empty database can't both win ADMIN.
+    let isFirstAdmin = false;
     const userCount = await User.countDocuments();
-    req.body.role = userCount === 0 ? [ADMIN] : [STUDENT];
-    const user = await authService.register(req.body, req.files);
+    if (userCount === 0) {
+      try {
+        await BootstrapLock.create({ _id: "admin-bootstrap" });
+        isFirstAdmin = true;
+      } catch (lockErr) {
+        if (lockErr.code !== 11000) throw lockErr;
+      }
+    }
+    req.body.role = isFirstAdmin ? [ADMIN] : [STUDENT];
+
+    let user;
+    try {
+      user = await authService.register(req.body, req.files);
+    } catch (registerErr) {
+      // Registration itself failed (e.g. duplicate email) — release the
+      // bootstrap slot so it isn't burned on a user that was never created.
+      if (isFirstAdmin) await BootstrapLock.deleteOne({ _id: "admin-bootstrap" });
+      throw registerErr;
+    }
     const token = jwt.generateJwt(user);
 
     
-    res.cookie("authCookies", token, {
-      maxAge: 86400 * 1000,
-    });
+    res.cookie("token", token, authCookieOptions);
     res.status(200).json({ ...user, token });
   } catch (err) {
     res.status(400).send(err.message);
@@ -45,7 +74,7 @@ const forgetPassword = async (req, res) => {
     const forget = await authService.forgetPassword(req.body?.email);
     res.json(forget);
   } catch (error) {
-    res.status(400).json(error.message);
+    res.status(error.status || error.statusCode || 400).json(error.message);
   }
 };
 
@@ -53,12 +82,12 @@ const forgetPassword = async (req, res) => {
 
 const resetPassword=async(req,res)=>{
     try {
-        
+
         const reset=await authService.resetPassword(req.body)
         res.json(reset)
     } catch (error) {
-        res.status(400).json(error.message)
-        
+        res.status(error.status || error.statusCode || 400).json(error.message)
+
     }
 }
 export default { login, register, forgetPassword,resetPassword };

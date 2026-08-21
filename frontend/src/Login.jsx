@@ -280,9 +280,9 @@ export default function Login() {
                 <label className="text-xs font-bold text-slate-600 tracking-wide uppercase block group-focus-within:text-[#2563EB] transition-colors duration-200">
                   Password
                 </label>
-                <a href="#forgot" className="text-xs font-semibold text-[#2563EB] hover:text-[#0F4CDB] transition-colors duration-200">
+                <Link to="/forgot-password" className="text-xs font-semibold text-[#2563EB] hover:text-[#0F4CDB] transition-colors duration-200">
                   Forgot Password?
-                </a>
+                </Link>
               </div>
               <div className="relative">
                 <span className="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none text-slate-400 group-focus-within:text-[#2563EB] transition-colors duration-200">

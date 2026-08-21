@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { userAPI } from "../services/api";
+import { userAPI, teacherAPI, studentAPI } from "../services/api";
 import { mockUsers } from "../services/mockApi";
 
 const inputCls = "w-full border border-blue-100 bg-blue-50/40 rounded-xl px-3 py-2 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-400 transition-all";
@@ -8,13 +8,18 @@ const inputCls = "w-full border border-blue-100 bg-blue-50/40 rounded-xl px-3 py
 function AddUserModal({ role, onSave, onClose }) {
   const [form, setForm] = useState({
     name: "", email: "", password: "", phone: "", city: "", gender: "MALE", dob: "",
+    course: "", semester: "", className: "", department: "",
   });
   const profileRef = useRef(null);
   const handleChange = (e) => setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
 
+  const isStudent = role === "Student";
+
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!form.name.trim() || !form.email.trim() || !form.password || !form.phone.trim() || !form.city.trim() || !form.dob) return;
+    if (isStudent && (!form.course.trim() || !form.semester.trim() || !form.className.trim())) return;
+    if (!isStudent && !form.department.trim()) return;
     onSave({
       name: form.name.trim(),
       email: form.email.trim(),
@@ -25,10 +30,12 @@ function AddUserModal({ role, onSave, onClose }) {
       dob: form.dob,
       role,
       profile: profileRef.current?.files[0] ?? null,
+      course: form.course.trim(),
+      semester: form.semester.trim(),
+      className: form.className.trim(),
+      department: form.department.trim(),
     });
   };
-
-  const isStudent = role === "Student";
 
   return (
     <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center z-50 p-4">
@@ -89,6 +96,28 @@ function AddUserModal({ role, onSave, onClose }) {
               </label>
               <input ref={profileRef} type="file" accept="image/*" className={inputCls} />
             </div>
+
+            {isStudent ? (
+              <div className="grid grid-cols-2 gap-3 pt-1 border-t border-slate-100">
+                <div className="col-span-2 pt-3">
+                  <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase tracking-wide">Course</label>
+                  <input required name="course" value={form.course} onChange={handleChange} placeholder="e.g. BSc CSIT" className={inputCls} />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase tracking-wide">Semester</label>
+                  <input required name="semester" value={form.semester} onChange={handleChange} placeholder="e.g. 3rd" className={inputCls} />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase tracking-wide">Class</label>
+                  <input required name="className" value={form.className} onChange={handleChange} placeholder="e.g. CSIT-A" className={inputCls} />
+                </div>
+              </div>
+            ) : (
+              <div className="pt-3 border-t border-slate-100">
+                <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase tracking-wide">Department</label>
+                <input required name="department" value={form.department} onChange={handleChange} placeholder="e.g. Computer Science" className={inputCls} />
+              </div>
+            )}
           </div>
           <div className="px-6 pb-5 flex gap-3">
             <button type="button" onClick={onClose} className="flex-1 py-2.5 rounded-xl border border-slate-200 text-sm font-medium text-slate-600 hover:bg-slate-50 transition-colors">Cancel</button>
@@ -269,8 +298,10 @@ function UserManagementTable() {
     }
   };
 
-  // Builds FormData for POST /user/addUser (multipart/form-data)
-  const handleAdd = async ({ name, email, password, phone, city, gender, dob, role, profile }) => {
+  // Builds FormData for POST /user/addUser (multipart/form-data), then creates the
+  // matching Teacher/Student profile document so features like Timetable (which
+  // reference a Teacher/Student profile, not the bare User) actually have data to use.
+  const handleAdd = async ({ name, email, password, phone, city, gender, dob, role, profile, course, semester, className, department }) => {
     try {
       const formData = new FormData();
       formData.append("userName", name);
@@ -284,6 +315,19 @@ function UserManagementTable() {
       if (profile) formData.append("profile", profile);
       const created = await userAPI.create(formData);
       setUsers((prev) => [...prev, created]);
+
+      try {
+        if (role === "Student") {
+          await studentAPI.create({ user: created.id, course, semester, className });
+        } else {
+          await teacherAPI.create({ user: created.id, department });
+        }
+      } catch (profileErr) {
+        setError(
+          `${name} was created, but the ${role.toLowerCase()} profile failed: ` +
+          (typeof profileErr.response?.data === "string" ? profileErr.response.data : profileErr.response?.data?.message ?? profileErr.message)
+        );
+      }
     } catch (err) {
       setError(typeof err.response?.data === "string" ? err.response.data : err.response?.data?.message ?? err.message);
     }

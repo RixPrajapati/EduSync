@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { marksAPI, attendanceAPI, feeAPI } from "../services/api";
+import { marksAPI, attendanceAPI, feeAPI, timetableAPI } from "../services/api";
 
 const getCurrentUser = () => {
   try {
@@ -14,6 +14,7 @@ function StudentOverview() {
   const [summary, setSummary] = useState(null);
   const [attendancePct, setAttendancePct] = useState(0);
   const [dueAmount, setDueAmount] = useState(0);
+  const [timetable, setTimetable] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -22,11 +23,13 @@ function StudentOverview() {
       marksAPI.getMySummary().catch(() => null),
       attendanceAPI.getMyPercentage(currentUser._id).catch(() => null),
       feeAPI.getMyFees().catch(() => []),
+      timetableAPI.getMyStudentTimetable().catch(() => []),
     ])
-      .then(([marksSummary, attendance, fees]) => {
+      .then(([marksSummary, attendance, fees, timetableList]) => {
         setSummary(marksSummary);
         setAttendancePct(Number(attendance?.percentage ?? 0));
         setDueAmount(fees.filter((f) => f.status !== "Paid").reduce((s, f) => s + f.amount, 0));
+        setTimetable(timetableList);
       })
       .finally(() => setLoading(false));
   }, []);
@@ -57,6 +60,34 @@ function StudentOverview() {
             <p className="text-2xl font-bold text-amber-700">${dueAmount.toLocaleString()}</p>
             <p className="text-xs font-semibold text-amber-600 mt-1">Fees Due</p>
           </div>
+        </div>
+      </div>
+
+      <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+        <div className="px-6 py-4 border-b border-slate-100">
+          <h2 className="text-sm font-bold text-slate-700">Your Timetable</h2>
+        </div>
+        <div className="p-5">
+          {timetable.length === 0 ? (
+            <p className="text-sm text-slate-400 text-center py-6">No timetable entries found.</p>
+          ) : (
+            <div className="space-y-2">
+              {timetable.map((t) => (
+                <div key={t._id} className="flex items-center justify-between border border-slate-100 rounded-xl px-4 py-3">
+                  <div>
+                    <p className="text-sm font-semibold text-slate-800">{t.subject}</p>
+                    <p className="text-xs text-slate-400 mt-0.5">
+                      {t.teacher?.user?.userName ?? "—"} · Room {t.roomNumber}
+                    </p>
+                  </div>
+                  <div className="text-right">
+                    <span className="text-xs font-bold px-2.5 py-1 rounded-full bg-blue-100 text-blue-700">{t.day}</span>
+                    <p className="text-xs text-slate-400 mt-1">{t.startTime} – {t.endTime}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </div>

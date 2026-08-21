@@ -13,5 +13,14 @@ const config = {
     apisecret: process.env.CLOUDINARY_API_SECRET || "",
   },
   resend_email_api_key: process.env.RESEND_EMAIL_API_KEY || "",
+  // Resend's shared sandbox sender — only works for test sends to the account
+  // owner. Set RESEND_FROM_EMAIL to a verified domain address before relying
+  // on this in production.
+  resend_from_email: process.env.RESEND_FROM_EMAIL || "onboarding@resend.dev",
+  // Comma-separated list of allowed frontend origins, e.g. "https://app.edusync.com,https://staging.edusync.com"
+  corsOrigins: (process.env.CORS_ORIGIN || "http://localhost:5173")
+    .split(",")
+    .map((origin) => origin.trim())
+    .filter(Boolean),
 };
 export default config;

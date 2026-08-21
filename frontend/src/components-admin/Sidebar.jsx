@@ -41,6 +41,11 @@ const navItems = [
     label: "Notices",
     d: "M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z",
   },
+  {
+    id: "timetable",
+    label: "Timetable",
+    d: "M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z",
+  },
 ];
 
 const ROLE_LABELS = { ADMIN: "Administrator", TEACHER: "Teacher", STUDENT: "Student" };
