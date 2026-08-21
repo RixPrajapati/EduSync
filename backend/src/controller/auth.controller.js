@@ -4,13 +4,21 @@ import { STUDENT, ADMIN } from "../constants/role.js";
 import User from "../models/User.js";
 import BootstrapLock from "../models/BootstrapLock.js";
 
+// httpOnly so an XSS payload can't read the token via document.cookie; secure
+// in production since that's HTTPS-only; sameSite lax is enough since the
+// frontend/backend are same-site (differ only by port) in this deployment.
+const authCookieOptions = {
+  maxAge: 86400 * 1000,
+  httpOnly: true,
+  secure: process.env.NODE_ENV === "production",
+  sameSite: "lax",
+};
+
 const login = async (req, res) => {
   try {
     const user = await authService.login(req.body);
     const token = jwt.generateJwt(user);
-    res.cookie("token", token, {
-      maxAge: 86400 * 1000,
-    });
+    res.cookie("token", token, authCookieOptions);
     res.status(200).json({ ...user, token });
   } catch (err) {
     res.status(400).send(err.message);
@@ -54,9 +62,7 @@ const register = async (req, res) => {
     const token = jwt.generateJwt(user);
 
     
-    res.cookie("authCookies", token, {
-      maxAge: 86400 * 1000,
-    });
+    res.cookie("token", token, authCookieOptions);
     res.status(200).json({ ...user, token });
   } catch (err) {
     res.status(400).send(err.message);
