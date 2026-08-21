@@ -33,7 +33,10 @@ app.use(bodyParser.json());
 app.use(cookieParser());
 app.use(cors());
 
-const upload = multer({ storage: multer.memoryStorage() });
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB — memoryStorage buffers the whole file in RAM
+});
 
 app.use("/api/user", upload.array("profile", 12), userRouter);
 app.use("/api/auth", upload.array("profile", 12), authRouter);

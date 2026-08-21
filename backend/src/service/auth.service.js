@@ -99,12 +99,12 @@ const forgetPassword = async (email) => {
     };
   }
   const token = crypto.randomUUID();
-  const forgetPassword = ResetPassword.create({
+  await ResetPassword.create({
     userId: existUser._id,
     token: token,
   });
   const link = `${config.app_url}/reset-password?userId=${existUser._id}&token=${token}`;
-  sendEmail({
+  await sendEmail({
     recipient: email,
     subject: "Reset password link ",
     html: `<div
