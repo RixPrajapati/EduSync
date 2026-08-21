@@ -84,7 +84,7 @@ const createTimetable = async (data) => {
 
 const getAllTimetables = async () => {
     const timetables = await Timetable.find()
-        .populate("teacher")
+        .populate({ path: "teacher", populate: { path: "user", select: "-password" } })
         .sort({
             day: 1,
             startTime: 1,
@@ -254,7 +254,7 @@ const getStudentTimetable = async (className) => {
     }
 
     const timetable = await Timetable.find({ className })
-        .populate("teacher")
+        .populate({ path: "teacher", populate: { path: "user", select: "-password" } })
         .sort({
             day: 1,
             startTime: 1,
