@@ -30,6 +30,14 @@ export const authAPI = {
   // the very first account ever created becomes ADMIN, every one after is STUDENT.
   register: (formData) =>
     apiClient.post("/auth/register", formData).then((res) => res.data),
+
+  // POST /auth/forget-password — { email } — emails a reset link, valid 1 hour
+  forgetPassword: (email) =>
+    apiClient.post("/auth/forget-password", { email }).then((res) => res.data),
+
+  // POST /auth/reset-password — { userId, token, password }
+  resetPassword: (userId, token, password) =>
+    apiClient.post("/auth/reset-password", { userId, token, password }).then((res) => res.data),
 };
 
 export const userAPI = {
