@@ -74,7 +74,7 @@ const forgetPassword = async (req, res) => {
     const forget = await authService.forgetPassword(req.body?.email);
     res.json(forget);
   } catch (error) {
-    res.status(400).json(error.message);
+    res.status(error.status || error.statusCode || 400).json(error.message);
   }
 };
 
@@ -82,12 +82,12 @@ const forgetPassword = async (req, res) => {
 
 const resetPassword=async(req,res)=>{
     try {
-        
+
         const reset=await authService.resetPassword(req.body)
         res.json(reset)
     } catch (error) {
-        res.status(400).json(error.message)
-        
+        res.status(error.status || error.statusCode || 400).json(error.message)
+
     }
 }
 export default { login, register, forgetPassword,resetPassword };
