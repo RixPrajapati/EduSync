@@ -27,3 +27,5 @@
 2026-07-02 11:31:07 ERROR: Cannot read properties of undefined (reading '_id') - /api/notice/create - POST - ::1
 2026-07-02 11:31:27 ERROR: Cannot read properties of undefined (reading '_id') - /api/notice/create - POST - ::1
 2026-07-02 12:29:20 ERROR: Cannot read properties of undefined (reading 'role') - /api/notice/create - POST - ::1
+2026-08-27 17:50:31 ERROR: No teachers found. - /api/teachers - GET - ::1
+2026-08-27 17:50:31 ERROR: No teachers found. - /api/teachers - GET - ::1
