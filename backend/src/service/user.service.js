@@ -5,14 +5,14 @@ import { file } from "zod";
 import authService from "./auth.service.js";
 
 const getUsers = () => {
-    return User.find();
+    return User.find().select("-password");
 }
 const createUser = async (user,files) => {
    return authService.register(user,files)
 }
 
 const updateUser = async (id, data) => {
-    const user = await User.findByIdAndUpdate(id, data, { new: true, runValidators: true });
+    const user = await User.findByIdAndUpdate(id, data, { new: true, runValidators: true }).select("-password");
     if (!user) {
         const error = new Error("User not found");
         error.statusCode = 404;
@@ -22,7 +22,7 @@ const updateUser = async (id, data) => {
 }
 
 const deleteUser = async (id) => {
-    const user = await User.findByIdAndDelete(id);
+    const user = await User.findByIdAndDelete(id).select("-password");
     if (!user) {
         const error = new Error("User not found");
         error.statusCode = 404;
